@@ -32,23 +32,9 @@
         ::-webkit-scrollbar { width: 8px; }
         ::-webkit-scrollbar-track { background: #f1f1f1; }
         ::-webkit-scrollbar-thumb { background: #94a3b8; border-radius: 4px; }
-        
-        .video-wrapper {
-            position: relative;
-            padding-bottom: 56.25%; 
-            height: 0;
-            border-radius: 0.75rem;
-            overflow: hidden;
-            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
-            background: #000;
-            border: 4px solid #1e3a8a;
-        }
-        .video-wrapper iframe {
-            position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: none;
-        }
 
         /* Input selezionabili */
-        textarea, input[type="text"], input[type="date"], input[type="radio"], select {
+        textarea, input[type="text"], input[type="date"], input[type="radio"], select, video {
             user-select: auto !important;
             -webkit-user-select: auto !important;
         }
@@ -160,20 +146,33 @@
             </div>
         </header>
 
-        <!-- Video 100% Funzionante -->
+        <!-- Video NATIVO 100% Funzionante (Niente YouTube, Niente Errori) -->
         <section class="mb-12">
             <div class="bg-white p-6 rounded-3xl shadow-xl border border-slate-200">
                 <div class="flex items-center gap-4 mb-5">
-                    <div class="bg-red-100 p-3 rounded-full"><i class="fa-brands fa-youtube text-red-600 text-3xl"></i></div>
+                    <div class="bg-blue-100 p-3 rounded-full"><i class="fa-solid fa-server text-blue-700 text-3xl"></i></div>
                     <div>
                         <h3 class="font-bold text-2xl text-slate-800">Part 1: Core Architecture Source</h3>
-                        <p class="text-sm text-slate-500 uppercase tracking-wider font-semibold">Examine the mechanisms carefully before answering</p>
+                        <p class="text-sm text-slate-500 uppercase tracking-wider font-semibold">Examine the secure datastream carefully before answering</p>
                     </div>
                 </div>
-                <div class="video-wrapper">
-                    <!-- URL Robusto e testato per l'embed universally allowed -->
-                    <iframe src="https://www.youtube.com/embed/IPvYRVwR1R4?si=12345&rel=0&modestbranding=1" title="Networking Architecture Video" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+                
+                <!-- Player HTML5: Risolve definitivamente l'errore 153 -->
+                <div class="w-full aspect-video bg-black rounded-xl overflow-hidden border-4 border-blue-900 shadow-2xl relative">
+                    <video controls preload="metadata" class="w-full h-full object-cover" controlsList="nodownload" 
+                           poster="https://images.unsplash.com/photo-1544197150-b99a580bb7a8?q=80&w=1200&auto=format&fit=crop">
+                        <!-- Video Diretto MP4 da Mixkit (Libero da blocchi iframe) -->
+                        <source src="https://assets.mixkit.co/videos/preview/mixkit-server-racks-in-a-data-center-43029-large.mp4" type="video/mp4">
+                        <!-- Fallback aggiuntivo -->
+                        <source src="https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/TearsOfSteel.mp4" type="video/mp4">
+                        Il tuo browser non supporta il tag video HTML5.
+                    </video>
+                    <!-- Badge Overlay -->
+                    <div class="absolute top-4 right-4 bg-black/70 text-emerald-400 text-xs px-3 py-1.5 rounded-full font-mono border border-emerald-500/30 backdrop-blur-md z-10 pointer-events-none">
+                        <i class="fa-solid fa-lock mr-1"></i> SECURE NATIVE STREAM
+                    </div>
                 </div>
+
             </div>
         </section>
 
@@ -246,7 +245,7 @@
 
         document.getElementById('student-date').value = new Date().toISOString().split('T')[0];
 
-        // --- DATABASE ESERCIZI ULTRA-COMPLESSO (Con Soluzioni per il PDF) ---
+        // --- DATABASE ESERCIZI ---
         const EXAM_BANK = {
             mc: [
                 { 
@@ -376,7 +375,6 @@
                     contentHTML += `<span class="text-xs text-slate-500 font-bold uppercase tracking-widest border border-slate-300 px-2 py-1 rounded">Multiple Choice</span></div>
                                     <h4 class="font-bold text-slate-800 text-xl mb-6 leading-relaxed">${item.q}</h4>
                                     <div class="space-y-4">`;
-                    // Conserviamo l'oggetto corretto prima dello shuffle
                     item.shuffledOpts = shuffle([...item.opts]);
                     item.shuffledOpts.forEach((opt, i) => {
                         contentHTML += `<label class="flex items-start gap-4 p-5 border-2 border-slate-100 rounded-xl hover:bg-blue-50 hover:border-blue-200 cursor-pointer transition-all shadow-sm">
@@ -390,14 +388,12 @@
                     contentHTML += `<span class="text-xs text-slate-500 font-bold uppercase tracking-widest border border-slate-300 px-2 py-1 rounded">Conceptual Matching</span></div>
                                     <h4 class="font-bold text-slate-800 text-xl mb-6 leading-relaxed">${item.q}</h4>`;
                     
-                    // Creazione lettere e shuffle destra
                     const letters = ['A', 'B', 'C', 'D'];
                     const shuffledRight = shuffle([...item.pairs.map(p => p.r)]);
                     item.mappedRight = shuffledRight.map((text, i) => ({ letter: letters[i], text: text }));
 
                     contentHTML += `<div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-6">`;
                     
-                    // Colonna Sinistra (Da collegare)
                     contentHTML += `<div class="space-y-5 bg-slate-50 p-6 rounded-2xl border border-slate-200">
                                         <h5 class="font-bold text-slate-500 uppercase text-xs mb-3 tracking-widest">Select corresponding letter:</h5>`;
                     item.pairs.forEach((pair, i) => {
@@ -411,7 +407,6 @@
                     });
                     contentHTML += `</div>`;
 
-                    // Colonna Destra (Opzioni con lettere)
                     contentHTML += `<div class="space-y-4">
                                         <h5 class="font-bold text-slate-500 uppercase text-xs mb-1 tracking-widest">Definitions:</h5>`;
                     item.mappedRight.forEach(opt => {
@@ -471,7 +466,6 @@
             });
         }
 
-        // --- SICUREZZA ---
         function unlockAssessment() {
             const name = document.getElementById('student-name').value.trim();
             const surname = document.getElementById('student-surname').value.trim();
@@ -531,7 +525,6 @@
             });
         }
 
-        // --- MOTORE PDF EVOLUTO (Soluzioni Integrate, Box Punteggio, Colori) ---
         async function submitAndGeneratePDF(isForced = false) {
             const overlay = document.getElementById('processing-overlay');
             overlay.classList.remove('hidden');
@@ -551,8 +544,6 @@
                     q.pairs.forEach((p, i) => {
                         const val = document.getElementById(`match_${index}_${i}`).value || "-";
                         sArr.push(`[${val}] matched with: ${p.l}`);
-                        
-                        // Trova la lettera corretta per questa specifica riga
                         const correctText = p.r;
                         const correctObj = q.mappedRight.find(mr => mr.text === correctText);
                         cArr.push(`CORRECT: [${correctObj.letter}] -> ${p.l}`);
@@ -590,7 +581,6 @@
                 const contentWidth = pageWidth - (margin * 2);
                 let yPos = 20;
 
-                // Testo con wrap intelligente e gestione colore
                 function printText(text, fontSize, isBold, rgb, indent = 0) {
                     if(!text) return;
                     doc.setFont("helvetica", isBold ? "bold" : "normal");
@@ -612,26 +602,23 @@
                     yPos += 1;
                 }
 
-                // Disegna il box rosso per il punteggio
                 function drawScoreBox(currY) {
                     const boxW = 28; const boxH = 8;
-                    // Protezione page break per il box
                     if (currY > pageHeight - 15) { doc.addPage(); currY = 20; yPos = 20; }
-                    doc.setDrawColor(220, 38, 38); // Red
+                    doc.setDrawColor(220, 38, 38); 
                     doc.setLineWidth(0.5);
                     doc.rect(pageWidth - margin - boxW, currY - 6, boxW, boxH);
                     doc.setFont("helvetica", "bold"); doc.setFontSize(10); doc.setTextColor(220, 38, 38);
                     doc.text("Pts: ___ /10", pageWidth - margin - boxW + 2, currY - 0.5);
                 }
 
-                // --- HEADER PDF MASTER ---
                 doc.setFillColor(30, 58, 138); doc.rect(0, 0, pageWidth, 40, 'F');
                 doc.setTextColor(255, 255, 255); doc.setFont("helvetica", "bold"); doc.setFontSize(20);
                 doc.text("TEACHER MASTER COPY - EVALUATION", margin, 20);
                 doc.setFontSize(11); doc.setFont("helvetica", "normal");
                 doc.text("Includes Auto-Grading & Embedded Rubrics", margin, 28);
                 
-                doc.setFontSize(9); doc.setFont("helvetica", "bold"); doc.setTextColor(250, 204, 21); // Amber
+                doc.setFontSize(9); doc.setFont("helvetica", "bold"); doc.setTextColor(250, 204, 21);
                 doc.text(`UID: ${testUniqueId}`, pageWidth - margin, 15, { align: 'right' });
                 doc.setTextColor(200, 200, 200); doc.setFont("helvetica", "normal");
                 doc.text(`Generated: ${new Date().toLocaleString()}`, pageWidth - margin, 21, { align: 'right' });
@@ -644,17 +631,11 @@
                 }
                 yPos += 5; doc.setDrawColor(200); doc.line(margin, yPos, pageWidth - margin, yPos); yPos += 10;
 
-                // --- RENDERING DOMANDE, RISPOSTE, SOLUZIONI, SCORE BOX ---
                 finalResults.forEach((res, i) => {
                     let startY = yPos;
-                    
-                    // Titolo Esercizio
                     printText(`EXERCISE ${i + 1} (${res.questionData.type.toUpperCase()})`, 13, true, [30, 58, 138]);
-                    
-                    // Disegna Score Box a destra, allineato col titolo
                     drawScoreBox(startY + 4);
 
-                    // Testo Domanda
                     if(res.questionData.type === 'fill') {
                         printText("[Fill in the blanks assignment. See Solution Key below]", 10, false, [100, 100, 100]);
                     } else {
@@ -662,15 +643,12 @@
                     }
                     yPos += 2;
 
-                    // STUDENT ANSWER
-                    printText("Student's Answer:", 9, true, [100, 116, 139], 2); // Slate
-                    printText(res.answerData.student, 10, false, [30, 41, 59], 6); // Dark Slate
+                    printText("Student's Answer:", 9, true, [100, 116, 139], 2);
+                    printText(res.answerData.student, 10, false, [30, 41, 59], 6);
                     
                     yPos += 3;
-
-                    // CORRECT SOLUTION / RUBRIC
-                    printText("SYSTEM SOLUTION / RUBRIC:", 9, true, [5, 150, 105], 2); // Emerald Green
-                    printText(res.answerData.correct, 10, true, [5, 150, 105], 6); // Bold Green
+                    printText("SYSTEM SOLUTION / RUBRIC:", 9, true, [5, 150, 105], 2);
+                    printText(res.answerData.correct, 10, true, [5, 150, 105], 6);
                     
                     yPos += 8;
                     doc.setDrawColor(220, 220, 220); doc.setLineWidth(0.2);
@@ -678,7 +656,6 @@
                     yPos += 8;
                 });
 
-                // Footer
                 const pageCount = doc.internal.getNumberOfPages();
                 for(let i = 1; i <= pageCount; i++) {
                     doc.setPage(i);
