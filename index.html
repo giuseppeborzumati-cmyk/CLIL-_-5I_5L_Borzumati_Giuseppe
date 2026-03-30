@@ -6,388 +6,473 @@
     <meta name="google" content="notranslate">
     <title>Official CLIL Examination - Cybersecurity</title>
     
-    <!-- Librerie: Tailwind, HTML2PDF, FontAwesome, Barcode Font -->
+    <!-- Librerie: Tailwind (con config per colori custom), HTML2PDF, FontAwesome -->
     <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        cyber: {
+                            dark: '#0f172a',
+                            light: '#1e293b',
+                            accent: '#06b6d4', // Cyan
+                            alert: '#ef4444',  // Red
+                            success: '#10b981' // Emerald
+                        }
+                    }
+                }
+            }
+        }
+    </script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;700&family=Libre+Barcode+39&display=swap');
+        /* IMPORT FONT PROFESSIONALI */
+        @import url('https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,400;0,600;0,800;1,400&family=Noto+Serif:ital,wght@0,400;0,700;1,400&family=JetBrains+Mono:wght@400;700&family=Libre+Barcode+39&display=swap');
         
-        /* BLOCCO COPIA/INCOLLA/SELEZIONE */
+        /* IMPOSTAZIONI BASE E ANTI-CHEAT */
         body {
-            font-family: 'Inter', sans-serif;
-            background-color: #cbd5e1;
+            font-family: 'Montserrat', sans-serif;
+            background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+            background-attachment: fixed;
+            min-height: 100vh;
             -webkit-touch-callout: none;
             -webkit-user-select: none;
-            -khtml-user-select: none;
-            -moz-user-select: none;
             -ms-user-select: none;
             user-select: none;
         }
-        
-        /* Stile Foglio Ufficiale */
+
+        /* TIPOGRAFIA SPECIFICA */
+        .font-serif { font-family: 'Noto Serif', serif; }
+        .font-mono { font-family: 'JetBrains Mono', monospace; }
+        .barcode { font-family: 'Libre Barcode 39', cursive; font-size: 3.5rem; line-height: 0.8; color: #0f172a; }
+
+        /* FOGLIO D'ESAME SU SCHERMO */
         .exam-paper {
-            background-color: white;
-            padding: 3.5rem 4rem;
-            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+            background-color: #ffffff;
+            padding: 4rem 5rem;
+            box-shadow: 0 25px 50px -12px rgba(0,0,0,0.5), 0 0 0 1px rgba(255,255,255,0.1);
             max-width: 950px;
-            margin: 0 auto;
+            margin: 2rem auto;
             position: relative;
-            background-image: radial-gradient(#e2e8f0 1px, transparent 1px);
-            background-size: 20px 20px;
-            background-position: -10px -10px;
+            border-top: 12px solid #06b6d4; /* Accento Cyan */
+            border-radius: 4px;
         }
 
-        .exam-title { font-family: 'Libre Baskerville', serif; }
-        .barcode { font-family: 'Libre Barcode 39', cursive; font-size: 3rem; line-height: 1; color: #1e293b; }
-        .code-font { font-family: 'JetBrains Mono', monospace; }
-
-        /* Input styling (Migliorato per il rendering PDF) */
+        /* STILI DEGLI INPUT (Per lo studente) */
         .student-input {
             border: none;
-            border-bottom: 2px solid #000 !important;
+            border-bottom: 2px solid #cbd5e1;
             background: transparent;
             width: 100%;
             font-family: 'JetBrains Mono', monospace;
             font-size: 1.1rem;
-            padding: 2px 5px;
-            color: #1e293b;
-            font-weight: 600;
-            border-radius: 0;
-        }
-        .student-input:focus { outline: none; border-bottom-color: #059669 !important; }
-
-        .blank-box {
-            border: 2px solid #94a3b8 !important;
-            border-radius: 4px;
-            width: 120px;
-            text-align: center;
-            font-weight: bold;
-            padding: 2px;
-            background: #f8fafc;
-        }
-        .match-box {
-            width: 40px;
-            border: 2px solid #0f172a !important;
-            text-align: center;
-            font-weight: bold;
-            text-transform: uppercase;
-            font-size: 1.1rem;
-            background-color: white;
-        }
-        .line-input { 
-            border: none; 
-            border-bottom: 1px dashed #64748b !important; 
-            width: 100%; 
-            background: transparent; 
-            padding: 4px; 
-            border-radius: 0;
-        }
-
-        /* TABS */
-        .tab-content { display: none; }
-        .tab-content.active { display: block; }
-        .tab-btn { opacity: 0.7; }
-        .tab-btn.active { opacity: 1; border-bottom: 4px solid #10b981; color: white; background: rgba(255,255,255,0.1); }
-        
-        /* Watermark */
-        .seal-bg {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            opacity: 0.03;
-            pointer-events: none;
-            z-index: 0;
-            font-size: 40rem;
+            padding: 4px 8px;
             color: #0f172a;
+            font-weight: 600;
+            transition: border-color 0.3s;
         }
+        .student-input:focus { outline: none; border-bottom-color: #06b6d4; }
+
+        .line-input {
+            border: none;
+            border-bottom: 2px dashed #94a3b8;
+            width: 100%;
+            background: rgba(248, 250, 252, 0.5);
+            padding: 6px 8px;
+            font-family: 'Montserrat', sans-serif;
+        }
+        .line-input:focus { outline: none; border-bottom: 2px solid #06b6d4; background: #f0fdfa; }
+
+        .match-box {
+            width: 45px;
+            height: 45px;
+            border: 2px solid #0f172a;
+            border-radius: 8px;
+            text-align: center;
+            font-weight: 800;
+            text-transform: uppercase;
+            font-size: 1.2rem;
+            background-color: #f8fafc;
+            color: #06b6d4;
+            box-shadow: inset 0 2px 4px rgba(0,0,0,0.05);
+        }
+
+        /* TABS UI */
+        .tab-content { display: none; animation: fadeIn 0.4s ease; }
+        .tab-content.active { display: block; }
+        .tab-btn { opacity: 0.6; transition: all 0.3s; }
+        .tab-btn.active { opacity: 1; border-bottom: 4px solid #06b6d4; color: white; background: rgba(255,255,255,0.05); }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
         /* =========================================================
-           REGOLE DI STAMPA PDF (IL SEGRETO PER UN PDF PERFETTO)
+           MOTORE DI STAMPA PDF (IL SEGRETO PER LA PERFEZIONE)
            ========================================================= */
         
-        /* Gestione Display Elementi */
-        .show-on-print { display: none !important; }
+        /* La classe viene aggiunta via JS un millisecondo prima di creare il PDF */
+        .pdf-export-mode .exam-paper {
+            max-width: 800px !important; /* Forza larghezza A4 a 96dpi (circa) */
+            width: 800px !important;
+            padding: 0 !important; /* I padding esterni li gestisce html2pdf sui margini */
+            box-shadow: none !important;
+            border-radius: 0 !important;
+            margin: 0 !important;
+            border-top: 8px solid #06b6d4 !important; /* Mantiene la linea colorata */
+        }
+
+        .pdf-export-mode .hide-on-print { display: none !important; }
+        .pdf-export-mode .show-on-print { display: block !important; }
         
-        /* 1. Prevenire i tagli a metà delle domande */
+        /* Box colorati e sfondi nel PDF: Forza la stampa dei colori */
+        .pdf-export-mode * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
+
+        /* Gestione dei tagli pagina: Cruciale! */
         .avoid-break {
             page-break-inside: avoid !important;
             break-inside: avoid !important;
-            margin-bottom: 1.5rem;
-        }
-        
-        /* 2. Ottimizzazione della pagina durante la fase di "fotografia" */
-        .html2pdf-generating .exam-paper {
-            max-width: 800px !important; /* Forza larghezza fissa proporzione A4 */
-            width: 800px !important;
-            padding: 0 !important; /* I margini li diamo tramite jsPDF */
-            box-shadow: none !important;
-            background-image: none !important; /* Rimuove lo sfondo a pallini */
-            background-color: white !important;
+            margin-bottom: 2rem !important; /* Spazio respiro nel PDF */
         }
 
-        .html2pdf-generating .hide-on-print { display: none !important; }
-        .html2pdf-generating .show-on-print { display: block !important; }
-        
-        /* Fix per l'Iframe YouTube (che diventa bianco nel PDF) */
-        .html2pdf-generating iframe { display: none !important; }
+        /* Fix Video su PDF: nascondi l'iframe, mostra il banner elegante */
+        .pdf-export-mode iframe { display: none !important; }
+        .show-on-print { display: none; }
 
         /* =========================================================
-           STILI MODALITÀ SOLUZIONI DOCENTE
+           MODALITÀ SOLUZIONI (DOCENTE)
            ========================================================= */
-        .solution-marker { display: none; color: #dc2626; font-weight: bold; margin-left: 8px; font-family: 'JetBrains Mono', monospace; font-size: 0.85rem;}
-        .solution-text { display: none; color: #dc2626; font-family: 'JetBrains Mono', monospace; font-size: 0.9rem; margin-top: 4px; border-left: 3px solid #dc2626; padding-left: 8px;}
+        .solution-marker { display: none; color: #ef4444; font-weight: 800; margin-left: 10px; font-family: 'JetBrains Mono', monospace; font-size: 0.9rem;}
+        .solution-text { display: none; color: #ef4444; font-family: 'JetBrains Mono', monospace; font-size: 0.95rem; margin-top: 6px; border-left: 4px solid #ef4444; padding-left: 12px; background: #fef2f2; padding-top: 4px; padding-bottom: 4px;}
         
         .solution-active .solution-marker { display: inline-block !important; }
         .solution-active .solution-text { display: block !important; }
-        .solution-active .match-box, .solution-active .blank-box { color: #dc2626 !important; border-color: #dc2626 !important; background: #fee2e2 !important; }
-        .solution-active input[type="radio"]:checked + span { font-weight: bold; color: #dc2626 !important; }
-        .solution-active .line-input { border-bottom: 2px solid #dc2626 !important; background: #fee2e2 !important; }
-        
+        .solution-active .match-box { color: #ef4444 !important; border-color: #ef4444 !important; background: #fef2f2 !important; }
+        .solution-active input[type="radio"]:checked + span { font-weight: bold; color: #ef4444 !important; text-decoration: underline; }
+        .solution-active .line-input { border-bottom: 2px solid #ef4444 !important; background: #fef2f2 !important; }
+
+        /* UI Element: Checkbox custom per MCQ */
+        .mcq-label { transition: background-color 0.2s; border-radius: 6px; padding: 6px; border: 1px solid transparent; }
+        .mcq-label:hover { background-color: #f8fafc; border-color: #e2e8f0; }
+
         /* Loader Overlay */
-        #loading-overlay { display: none; }
+        #loading-overlay { display: none; backdrop-filter: blur(8px); }
         .is-loading #loading-overlay { display: flex; }
 
     </style>
 </head>
-<body class="text-slate-900 pb-20">
+<body class="text-slate-800 pb-20">
 
-    <!-- Loading Overlay per generazione PDF -->
-    <div id="loading-overlay" class="fixed inset-0 bg-slate-900/80 z-[200] items-center justify-center flex-col backdrop-blur-sm">
-        <i class="fa-solid fa-spinner fa-spin text-emerald-500 text-6xl mb-4"></i>
-        <h2 class="text-white text-xl font-bold font-mono">Generating High-Quality PDF...</h2>
-        <p class="text-slate-300 mt-2 text-sm">Please wait, optimizing page breaks and fonts.</p>
+    <!-- OVERLAY CARICAMENTO PDF -->
+    <div id="loading-overlay" class="fixed inset-0 bg-cyber-dark/80 z-[200] items-center justify-center flex-col">
+        <div class="relative w-24 h-24 mb-6">
+            <div class="absolute inset-0 border-4 border-cyber-accent/20 rounded-full"></div>
+            <div class="absolute inset-0 border-4 border-cyber-accent rounded-full border-t-transparent animate-spin"></div>
+            <i class="fa-solid fa-microchip text-3xl text-cyber-accent absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2"></i>
+        </div>
+        <h2 class="text-white text-2xl font-bold tracking-wider">GENERATING DOCUMENT</h2>
+        <p class="text-cyber-accent mt-2 text-sm font-mono">Compiling High-Res PDF & Aligning Layout...</p>
     </div>
 
-    <!-- Header & Navigation -->
-    <div class="bg-[#0f172a] text-white shadow-2xl sticky top-0 z-50 hide-on-print border-b-4 border-emerald-500">
-        <div class="max-w-6xl mx-auto px-4">
-            <div class="py-5 flex flex-col md:flex-row justify-between items-center gap-4">
-                <div class="flex items-center">
-                    <i class="fa-solid fa-shield-halved text-4xl text-emerald-500 mr-4"></i>
+    <!-- HEADER WEB NAVBAR -->
+    <div class="bg-cyber-dark text-white shadow-2xl sticky top-0 z-50 hide-on-print border-b border-slate-700">
+        <div class="max-w-7xl mx-auto px-4">
+            <div class="py-4 flex flex-col md:flex-row justify-between items-center gap-4">
+                <div class="flex items-center gap-4">
+                    <div class="bg-cyber-accent/10 p-3 rounded-lg border border-cyber-accent/30">
+                        <i class="fa-solid fa-shield-virus text-3xl text-cyber-accent"></i>
+                    </div>
                     <div>
-                        <h1 class="text-2xl font-bold tracking-tight uppercase">Official Examination Portal</h1>
-                        <p class="text-emerald-200 text-sm font-mono mt-1">Computer Science Dept. | Prof. G. Borzumati | Anno di Prova</p>
+                        <h1 class="text-xl font-bold tracking-tight text-white">CLIL EXAM GENERATOR v2.0</h1>
+                        <p class="text-slate-400 text-xs font-mono mt-1"><i class="fa-solid fa-user-tie mr-1"></i> Prof. G. Borzumati | Anno di Prova</p>
                     </div>
                 </div>
                 <div class="flex gap-3">
-                    <button onclick="location.reload()" class="bg-slate-700 hover:bg-slate-600 text-white px-4 py-2 rounded font-bold transition flex items-center shadow">
-                        <i class="fa-solid fa-rotate-right mr-2"></i> New Test (F5)
+                    <button onclick="location.reload()" class="bg-slate-800 hover:bg-slate-700 text-white px-5 py-2.5 rounded text-sm font-bold transition flex items-center border border-slate-600">
+                        <i class="fa-solid fa-rotate mr-2"></i> Regenerate
                     </button>
-                    <button onclick="openPdfModal()" class="bg-emerald-600 hover:bg-emerald-500 text-white px-6 py-2 rounded font-bold transition shadow-[0_0_15px_rgba(16,185,129,0.5)] flex items-center">
-                        <i class="fa-solid fa-file-pdf mr-2"></i> Print / Save PDF
+                    <button onclick="openPdfModal()" class="bg-cyber-accent hover:bg-cyan-400 text-cyber-dark px-6 py-2.5 rounded text-sm font-bold transition shadow-[0_0_15px_rgba(6,182,212,0.4)] flex items-center">
+                        <i class="fa-solid fa-print mr-2"></i> Export PDF
                     </button>
                 </div>
             </div>
             
-            <!-- Tabs -->
+            <!-- TABS -->
             <div class="flex overflow-x-auto mt-2">
-                <button onclick="requestTabAccess('worksheet')" id="btn-worksheet" class="tab-btn active px-6 py-3 text-sm font-bold uppercase tracking-wider transition whitespace-nowrap">
-                    <i class="fa-solid fa-file-signature mr-2"></i> Candidate Exam
+                <button onclick="requestTabAccess('worksheet')" id="btn-worksheet" class="tab-btn active px-8 py-3 text-sm font-bold uppercase tracking-wider transition whitespace-nowrap">
+                    <i class="fa-solid fa-file-lines mr-2"></i> Exam Paper
                 </button>
-                <button onclick="requestTabAccess('transcript')" id="btn-transcript" class="tab-btn locked-tab px-6 py-3 text-sm font-bold uppercase tracking-wider transition whitespace-nowrap flex items-center">
-                    <i id="icon-transcript" class="fa-solid fa-lock text-red-400 mr-2"></i> Transcripts & Lesson
+                <button onclick="requestTabAccess('transcript')" id="btn-transcript" class="tab-btn locked-tab px-8 py-3 text-sm font-bold uppercase tracking-wider transition whitespace-nowrap flex items-center text-slate-400">
+                    <i id="icon-transcript" class="fa-solid fa-lock text-cyber-alert mr-2"></i> Teacher Resources
                 </button>
             </div>
         </div>
     </div>
 
-    <!-- Modals -->
-    <!-- 1. Password Tab Modal -->
-    <div id="auth-modal" class="fixed inset-0 bg-slate-900/95 hidden z-[100] flex items-center justify-center backdrop-blur-md">
-        <div class="bg-white rounded border-t-4 border-red-600 shadow-2xl max-w-sm w-full p-8 text-center">
-            <i class="fa-solid fa-user-shield text-5xl text-red-600 mb-4"></i>
-            <h3 class="text-2xl font-bold text-slate-900 mb-2 exam-title">Examiner Access</h3>
-            <p class="text-sm text-slate-500 mb-6">Restricted area. Please enter your examiner credentials.</p>
-            <input type="password" id="tab-pwd" placeholder="Enter Password..." class="w-full px-4 py-3 border-2 border-slate-300 mb-4 focus:border-red-600 outline-none text-center text-xl font-mono">
-            <div class="flex gap-2">
-                <button onclick="closeAuthModal()" class="w-1/3 bg-slate-200 hover:bg-slate-300 text-slate-800 font-bold py-3 transition">Cancel</button>
-                <button onclick="verifyTabAccess()" class="w-2/3 bg-red-600 hover:bg-red-700 text-white font-bold py-3 shadow-lg transition">Authorize</button>
+    <!-- MODALI -->
+    <!-- Modale Password Docente -->
+    <div id="auth-modal" class="fixed inset-0 bg-cyber-dark/90 hidden z-[100] flex items-center justify-center backdrop-blur-md">
+        <div class="bg-white rounded-xl shadow-2xl max-w-sm w-full p-8 text-center overflow-hidden relative">
+            <div class="h-2 w-full bg-cyber-alert absolute top-0 left-0"></div>
+            <div class="bg-red-50 w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-4 border border-red-100">
+                <i class="fa-solid fa-user-lock text-3xl text-cyber-alert"></i>
+            </div>
+            <h3 class="text-2xl font-extrabold text-slate-800 mb-2">Examiner Access</h3>
+            <p class="text-sm text-slate-500 mb-6">Restricted area. Authentication required.</p>
+            <input type="password" id="tab-pwd" placeholder="Enter PIN..." class="w-full px-4 py-3 border-2 border-slate-200 rounded-lg mb-6 focus:border-cyber-alert outline-none text-center text-xl font-mono tracking-widest bg-slate-50">
+            <div class="flex gap-3">
+                <button onclick="closeAuthModal()" class="w-1/2 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold py-3 rounded-lg transition">Cancel</button>
+                <button onclick="verifyTabAccess()" class="w-1/2 bg-cyber-alert hover:bg-red-600 text-white font-bold py-3 rounded-lg shadow-lg shadow-red-500/30 transition">Unlock</button>
             </div>
         </div>
     </div>
 
-    <!-- 2. PDF Download Modal -->
-    <div id="pdf-modal" class="fixed inset-0 bg-slate-900/95 hidden z-[100] flex items-center justify-center backdrop-blur-md">
-        <div class="bg-white rounded border-t-4 border-emerald-600 shadow-2xl max-w-md w-full p-8">
-            <h3 class="text-2xl font-bold text-slate-900 mb-2 exam-title text-center">Generate Document</h3>
-            <p class="text-sm text-slate-500 mb-6 text-center">The system will perfectly align page breaks.</p>
-            <input type="password" id="teacher-pwd" placeholder="Examiner Password (For Answer Key)" class="w-full px-4 py-3 border-2 border-slate-300 mb-4 focus:border-emerald-600 outline-none text-center font-mono">
+    <!-- Modale Selezione PDF -->
+    <div id="pdf-modal" class="fixed inset-0 bg-cyber-dark/90 hidden z-[100] flex items-center justify-center backdrop-blur-md">
+        <div class="bg-white rounded-xl shadow-2xl max-w-md w-full p-8 relative overflow-hidden">
+            <div class="h-2 w-full bg-cyber-accent absolute top-0 left-0"></div>
+            <h3 class="text-2xl font-extrabold text-slate-800 mb-2 text-center">Export Document</h3>
+            <p class="text-sm text-slate-500 mb-6 text-center">Select the version you want to generate. The system will optimize layouts for A4 printing.</p>
+            
+            <div class="bg-slate-50 p-4 rounded-lg border border-slate-200 mb-6">
+                <label class="text-xs font-bold text-slate-500 uppercase mb-2 block"><i class="fa-solid fa-key mr-1"></i> Examiner Password (for Answer Key)</label>
+                <input type="password" id="teacher-pwd" placeholder="Leave blank for student version" class="w-full px-4 py-2 border border-slate-300 rounded focus:border-cyber-accent outline-none font-mono">
+            </div>
+
             <div class="flex flex-col gap-3">
-                <button onclick="processDownload(true)" class="w-full bg-[#0f172a] hover:bg-slate-800 text-white font-bold py-4 flex justify-center items-center transition shadow-xl border border-slate-600">
-                    <i class="fa-solid fa-key text-red-400 mr-2"></i> Generate Examiner Answer Key
+                <button onclick="processDownload(false)" class="w-full bg-white hover:bg-slate-50 text-slate-800 border-2 border-slate-200 font-bold py-4 rounded-lg flex justify-center items-center transition">
+                    <i class="fa-regular fa-file-pdf mr-2 text-cyber-accent text-xl"></i> 
+                    <div>
+                        <div class="text-sm">Blank Student Exam</div>
+                        <div class="text-[10px] text-slate-400 font-normal">Ready for printing</div>
+                    </div>
                 </button>
-                <button onclick="processDownload(false)" class="w-full bg-emerald-50 hover:bg-emerald-100 text-emerald-900 border-2 border-emerald-200 font-bold py-4 flex justify-center items-center transition">
-                    <i class="fa-solid fa-file-pdf mr-2"></i> Generate Blank Candidate Exam
+                <button onclick="processDownload(true)" class="w-full bg-slate-900 hover:bg-slate-800 text-white font-bold py-4 rounded-lg flex justify-center items-center transition shadow-lg">
+                    <i class="fa-solid fa-check-double mr-2 text-cyber-alert text-xl"></i>
+                    <div>
+                        <div class="text-sm">Examiner Answer Key</div>
+                        <div class="text-[10px] text-slate-400 font-normal">Contains red text solutions</div>
+                    </div>
                 </button>
-                <button onclick="closePdfModal()" class="w-full text-slate-500 hover:text-slate-800 py-2 text-sm underline mt-2">Cancel</button>
+                <button onclick="closePdfModal()" class="w-full text-slate-400 hover:text-slate-600 py-2 text-sm mt-2 transition">Cancel</button>
             </div>
         </div>
     </div>
 
-    <!-- MAIN CONTENT -->
-    <div class="max-w-6xl mx-auto mt-10 px-4">
+    <!-- AREA PRINCIPALE CONTENUTI -->
+    <div class="max-w-6xl mx-auto px-4">
 
         <!-- ========================================== -->
-        <!-- TAB 1: WORKSHEET (CANDIDATE EXAM)          -->
+        <!-- TAB 1: IL FOGLIO D'ESAME                   -->
         <!-- ========================================== -->
         <div id="tab-worksheet" class="tab-content active">
-            <div id="pdf-content-wrapper" class="exam-paper relative overflow-hidden">
+            <!-- Questo è il div che viene "fotografato" -->
+            <div id="pdf-content-wrapper" class="exam-paper">
                 
-                <!-- Watermarks -->
-                <i class="fa-solid fa-user-secret seal-bg"></i>
-                <div id="solution-watermark" class="hidden absolute inset-0 flex items-center justify-center pointer-events-none overflow-hidden opacity-[0.05] z-0">
-                    <h1 class="text-[180px] font-black text-red-600 transform -rotate-45 font-mono whitespace-nowrap">CONFIDENTIAL KEY</h1>
-                </div>
+                <!-- INTESTAZIONE FOGLIO (Design Premium) -->
+                <div class="avoid-break mb-8 border-b-2 border-slate-200 pb-6 relative">
+                    <!-- Decorazione Background Intestazione -->
+                    <div class="absolute top-0 right-0 opacity-5 pointer-events-none">
+                        <i class="fa-solid fa-shield-halved text-[150px]"></i>
+                    </div>
 
-                <!-- OFFICIAL HEADER (Evita tagli) -->
-                <div class="avoid-break border-b-4 border-slate-900 pb-6 mb-8 relative z-10 flex justify-between items-start">
-                    <div class="w-2/3">
-                        <div class="flex items-center mb-2">
-                            <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/4/4f/European_Union_flag_and_IT_flag.svg/512px-European_Union_flag_and_IT_flag.svg.png" class="h-6 mr-3 opacity-80" alt="EU/IT">
-                            <span class="text-xs font-bold tracking-widest uppercase text-slate-500">Ministry of Education - CLIL Program</span>
+                    <div class="flex justify-between items-start relative z-10">
+                        <!-- Sinistra: Info Scuola e Titolo -->
+                        <div class="w-2/3">
+                            <div class="flex items-center gap-3 mb-4">
+                                <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/4/4f/European_Union_flag_and_IT_flag.svg/512px-European_Union_flag_and_IT_flag.svg.png" class="h-5" alt="EU/IT">
+                                <div class="text-[10px] font-bold tracking-widest uppercase text-slate-400 bg-slate-100 px-2 py-1 rounded">Ministry of Education - CLIL Framework</div>
+                            </div>
+                            <h1 class="text-4xl font-extrabold text-slate-900 font-serif leading-tight mb-1">
+                                <span class="text-cyber-accent">Cybersecurity</span> & IT Defense
+                            </h1>
+                            <h2 class="text-lg text-slate-500 font-bold uppercase tracking-wider">Paper 2: Digital Threats & Mitigation</h2>
                         </div>
-                        <h1 class="text-4xl font-extrabold text-slate-900 exam-title uppercase leading-tight">Cybersecurity & IT Defense</h1>
-                        <h2 class="text-xl text-slate-700 font-bold mt-2">Paper 2: Viruses, DDoS & Phishing</h2>
-                    </div>
-                    <div class="w-1/3 text-right">
-                        <div class="barcode mb-1" id="barcode-display">12345678</div>
-                        <p class="font-mono text-xs font-bold tracking-wider text-slate-600">BOOKLET ID: <span id="doc-id" class="text-slate-900"></span></p>
-                        <p class="font-mono text-[10px] text-slate-500 mt-1">TIME ALLOWED: 60 MINS</p>
+                        
+                        <!-- Destra: Codici a barre e ID -->
+                        <div class="w-1/3 text-right">
+                            <div class="barcode mb-2" id="barcode-display">12345678</div>
+                            <div class="bg-slate-50 border border-slate-200 inline-block p-2 rounded text-left">
+                                <p class="font-mono text-xs text-slate-500">BOOKLET ID: <span id="doc-id" class="text-slate-900 font-bold"></span></p>
+                                <p class="font-mono text-[10px] text-slate-400 mt-0.5">TIME ALLOWED: 60 MINS</p>
+                            </div>
+                        </div>
                     </div>
                 </div>
 
-                <!-- CANDIDATE INFO (Evita tagli) -->
-                <div class="avoid-break bg-slate-50 border-2 border-slate-900 p-6 mb-10 relative z-10">
-                    <div class="grid grid-cols-12 gap-6">
+                <!-- BOX DATI CANDIDATO -->
+                <div class="avoid-break bg-[#f8fafc] border border-slate-300 rounded-lg p-6 mb-10 relative z-10 shadow-sm">
+                    <div class="absolute -top-3 left-4 bg-[#f8fafc] px-2 text-[10px] font-bold text-slate-400 uppercase tracking-widest">Candidate Details</div>
+                    <div class="grid grid-cols-12 gap-8">
                         <div class="col-span-12 md:col-span-5">
-                            <label class="block text-xs font-bold text-slate-700 uppercase tracking-widest mb-1">Candidate Surname</label>
+                            <label class="block text-xs font-bold text-slate-700 uppercase mb-2">Surname</label>
                             <input type="text" class="student-input uppercase">
                         </div>
                         <div class="col-span-12 md:col-span-5">
-                            <label class="block text-xs font-bold text-slate-700 uppercase tracking-widest mb-1">First Name(s)</label>
+                            <label class="block text-xs font-bold text-slate-700 uppercase mb-2">First Name(s)</label>
                             <input type="text" class="student-input capitalize">
                         </div>
                         <div class="col-span-12 md:col-span-2">
-                            <label class="block text-xs font-bold text-slate-700 uppercase tracking-widest mb-1">Class / Form</label>
+                            <label class="block text-xs font-bold text-slate-700 uppercase mb-2">Class</label>
                             <input type="text" class="student-input text-center">
                         </div>
                     </div>
-                    <p class="text-[10px] text-slate-500 uppercase mt-4 text-center font-bold tracking-widest">Read all instructions carefully before starting. Answer all questions in English based on the video provided.</p>
+                    <div class="mt-5 pt-4 border-t border-slate-200 flex items-center justify-center text-xs text-slate-500">
+                        <i class="fa-solid fa-circle-info text-cyber-accent mr-2"></i>
+                        <span>Read all instructions carefully. Answer all questions in English based on the video resource provided.</span>
+                    </div>
                 </div>
 
-                <!-- EXERCISES -->
-                <div id="exercises-container" class="relative z-10">
+                <!-- CONTENITORE ESERCIZI -->
+                <div id="exercises-container">
                     
-                    <!-- Section 1: Video (Evita tagli) -->
-                    <div class="avoid-break">
-                        <h3 class="text-xl font-bold text-slate-900 border-b-2 border-slate-900 pb-2 mb-4 flex items-center exam-title">
-                            <span class="bg-slate-900 text-white px-3 py-1 mr-3 text-sm font-mono">PART 1</span> 
-                            Listening & Comprehension <span class="text-sm font-sans font-normal text-slate-500 ml-auto">[ 10 Marks ]</span>
-                        </h3>
-                        <p class="text-sm text-slate-700 mb-4 italic">Instructions: Watch the documentary "Cybersecurity & Crime". Pay attention to the definitions of malware, DDoS attacks, and phishing techniques.</p>
-                        
-                        <!-- Player Online (nascosto su PDF) -->
-                        <div class="bg-black p-1 rounded hide-on-print shadow-xl mb-6">
-                            <iframe class="w-full h-80" src="https://www.youtube-nocookie.com/embed/AuYNXgO_f3Y?rel=0&modestbranding=1&hl=en&cc_load_policy=1" title="Video" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+                    <!-- Section 1: Video Player / Riquadro Stampa -->
+                    <div class="avoid-break mb-10">
+                        <div class="flex items-center mb-4">
+                            <div class="bg-cyber-dark text-white font-mono text-sm font-bold px-3 py-1 rounded-l">PART 1</div>
+                            <div class="bg-cyber-accent/10 text-cyber-dark font-bold px-4 py-1 flex-1 uppercase tracking-wider text-sm border-y border-r border-cyber-accent/20 rounded-r">
+                                Audio-Visual Comprehension
+                            </div>
+                            <div class="ml-4 text-sm font-bold text-slate-400">[ 10 Marks ]</div>
                         </div>
-                        <!-- Placeholder Stampa PDF (Mostrato solo su PDF) -->
-                        <div class="show-on-print text-center p-8 border-2 border-dashed border-slate-400 bg-slate-50 mb-6">
-                            <i class="fa-solid fa-laptop-code text-4xl text-slate-400 mb-3"></i>
-                            <h4 class="font-bold text-lg text-slate-800">Video Resource: Cybersecurity</h4>
-                            <p class="text-sm text-slate-600 mb-2">Teacher will provide video or scan the URL below:</p>
-                            <p class="code-font text-emerald-800 bg-emerald-100 py-2 px-4 inline-block rounded font-bold border border-emerald-300">https://youtu.be/AuYNXgO_f3Y</p>
+                        
+                        <p class="text-sm text-slate-600 mb-4 pl-2 border-l-2 border-slate-300">
+                            <strong>Instructions:</strong> Watch the documentary "Cybersecurity & Crime". Pay attention to the definitions of malware, DDoS attacks, and phishing techniques.
+                        </p>
+                        
+                        <!-- Web Player -->
+                        <div class="hide-on-print bg-slate-900 p-2 rounded-xl shadow-lg relative group">
+                            <div class="absolute top-4 right-4 bg-red-600 text-white text-[10px] font-bold px-2 py-1 rounded z-10 opacity-80 uppercase tracking-widest"><i class="fa-brands fa-youtube mr-1"></i> Source</div>
+                            <iframe class="w-full h-[400px] rounded-lg" src="https://www.youtube-nocookie.com/embed/AuYNXgO_f3Y?rel=0&modestbranding=1&hl=en&cc_load_policy=1" title="Video" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+                        </div>
+                        
+                        <!-- Print Fallback (Appare solo nel PDF) -->
+                        <div class="show-on-print bg-slate-50 border-2 border-slate-200 rounded-xl p-6 text-center">
+                            <div class="w-16 h-16 bg-white border border-slate-200 rounded-full flex items-center justify-center mx-auto mb-3 shadow-sm">
+                                <i class="fa-solid fa-play text-2xl text-cyber-accent ml-1"></i>
+                            </div>
+                            <h4 class="font-bold text-slate-800 text-lg">Media Resource Required</h4>
+                            <p class="text-xs text-slate-500 mb-4">The examiner will project the following video or provide access via the URL.</p>
+                            <div class="inline-block bg-white border border-slate-300 px-6 py-3 rounded-lg font-mono text-sm font-bold text-cyber-dark shadow-sm">
+                                <i class="fa-solid fa-link text-slate-400 mr-2"></i> https://youtu.be/AuYNXgO_f3Y
+                            </div>
                         </div>
                     </div>
                     
-                    <!-- JS Injects Sections 2 to 8 here -->
+                    <!-- JS Inietta Esercizi Qui -->
                     <div id="dynamic-exercises"></div>
 
                 </div>
 
-                <!-- OFFICIAL GRADING AREA (Evita tagli, se possibile su nuova pagina) -->
-                <div class="avoid-break mt-12 pt-8 border-t-4 border-slate-900 relative z-10" style="page-break-before: auto;">
-                    <div class="absolute -top-4 left-1/2 transform -translate-x-1/2 bg-white px-4 font-bold tracking-widest uppercase text-slate-500 text-sm">
-                        <i class="fa-solid fa-scissors mr-2"></i> Examiner Use Only <i class="fa-solid fa-scissors ml-2"></i>
+                <!-- AREA VALUTAZIONE (DOCENTE) -->
+                <div class="avoid-break mt-16 pt-1 relative" style="page-break-before: auto;">
+                    <!-- Linea di taglio figurata -->
+                    <div class="flex items-center justify-center mb-8 opacity-40">
+                        <div class="h-px bg-slate-800 flex-1"></div>
+                        <i class="fa-solid fa-scissors mx-4 text-slate-800"></i>
+                        <div class="text-xs font-bold tracking-widest uppercase text-slate-800 font-mono">Examiner Use Only</div>
+                        <div class="h-px bg-slate-800 flex-1"></div>
                     </div>
                     
-                    <div class="bg-slate-100 border-2 border-slate-400 p-6 mt-4 flex gap-8 shadow-inner">
+                    <div class="bg-white border-2 border-slate-200 rounded-xl overflow-hidden shadow-sm flex flex-col md:flex-row">
                         
-                        <!-- Score Box -->
-                        <div class="w-1/4 flex flex-col justify-center items-center bg-white border-2 border-slate-900 p-4 shadow">
-                            <span class="text-xs font-bold uppercase tracking-widest text-slate-500 mb-2">Total Score</span>
-                            <div class="text-5xl font-black font-mono text-slate-900">___</div>
-                            <div class="text-sm font-bold text-slate-500 mt-1 border-t-2 border-slate-200 w-full text-center pt-1">/ 100</div>
+                        <!-- Box Voto -->
+                        <div class="md:w-1/3 bg-slate-50 p-6 border-r border-slate-200 flex flex-col justify-center items-center text-center">
+                            <div class="w-12 h-12 bg-cyber-dark rounded-full flex items-center justify-center mb-4">
+                                <i class="fa-solid fa-award text-white text-xl"></i>
+                            </div>
+                            <div class="text-[10px] font-bold uppercase tracking-widest text-slate-500 mb-1">Total Score</div>
+                            <div class="text-6xl font-black font-mono text-slate-800 tracking-tighter">___</div>
+                            <div class="text-sm font-bold text-slate-400 border-t border-slate-300 w-24 pt-1 mt-1">/ 100</div>
                             
-                            <div class="mt-6 w-full">
-                                <span class="text-xs font-bold uppercase tracking-widest text-slate-500 block text-center mb-1">Final Grade</span>
-                                <div class="border-b-2 border-slate-900 h-8 text-center text-xl font-bold"></div>
+                            <div class="mt-8 w-full px-4">
+                                <div class="text-[10px] font-bold uppercase tracking-widest text-cyber-accent mb-2">Final Grade (IT System)</div>
+                                <div class="border-b-2 border-slate-800 h-10 w-full text-center text-2xl font-bold text-slate-900 bg-white"></div>
                             </div>
                         </div>
 
-                        <!-- Feedback Box -->
-                        <div class="w-3/4">
-                            <h4 class="font-bold text-slate-900 exam-title uppercase mb-3"><i class="fa-solid fa-clipboard-check mr-2"></i> Examiner's Final Report</h4>
+                        <!-- Box Rubrica Valutazione -->
+                        <div class="md:w-2/3 p-6 bg-white">
+                            <h4 class="font-bold text-slate-800 uppercase text-sm mb-4 border-b pb-2"><i class="fa-solid fa-clipboard-list text-slate-400 mr-2"></i> Evaluation Rubric</h4>
                             
-                            <div class="space-y-3 text-sm">
-                                <label class="flex items-start gap-3 p-1">
-                                    <div class="w-5 h-5 border-2 border-slate-600 bg-white mt-0.5"></div>
-                                    <div><strong class="text-emerald-700">Outstanding (9-10):</strong> Excellent grasp of cybersecurity concepts. Flawless understanding of malware, DDoS, and phishing mechanisms.</div>
-                                </label>
-                                <label class="flex items-start gap-3 p-1">
-                                    <div class="w-5 h-5 border-2 border-slate-600 bg-white mt-0.5"></div>
-                                    <div><strong class="text-blue-700">Very Good (8):</strong> Strong understanding of digital defense. Minor inaccuracies in distinguishing between attack types.</div>
-                                </label>
-                                <label class="flex items-start gap-3 p-1">
-                                    <div class="w-5 h-5 border-2 border-slate-600 bg-white mt-0.5"></div>
-                                    <div><strong class="text-yellow-600">Satisfactory/Pass (6-7):</strong> Adequate knowledge of basic concepts. Needs review on how DDoS attacks technically operate.</div>
-                                </label>
-                                <label class="flex items-start gap-3 p-1">
-                                    <div class="w-5 h-5 border-2 border-slate-600 bg-white mt-0.5"></div>
-                                    <div><strong class="text-red-600">Fail (<6):</strong> Insufficient understanding of core security threats. Difficulty comprehending English technical terms.</div>
-                                </label>
+                            <div class="space-y-3">
+                                <div class="flex items-start gap-3 p-2 rounded hover:bg-slate-50 border border-transparent transition">
+                                    <div class="w-5 h-5 border-2 border-slate-300 rounded-sm bg-white mt-0.5 shrink-0"></div>
+                                    <div class="text-sm"><span class="bg-emerald-100 text-emerald-800 font-bold px-2 py-0.5 rounded text-xs mr-2">9-10</span> <strong>Outstanding:</strong> Flawless understanding of malware, DDoS, and phishing mechanisms.</div>
+                                </div>
+                                <div class="flex items-start gap-3 p-2 rounded hover:bg-slate-50 border border-transparent transition">
+                                    <div class="w-5 h-5 border-2 border-slate-300 rounded-sm bg-white mt-0.5 shrink-0"></div>
+                                    <div class="text-sm"><span class="bg-blue-100 text-blue-800 font-bold px-2 py-0.5 rounded text-xs mr-2">8</span> <strong>Very Good:</strong> Strong understanding of digital defense concepts. Minor inaccuracies.</div>
+                                </div>
+                                <div class="flex items-start gap-3 p-2 rounded hover:bg-slate-50 border border-transparent transition">
+                                    <div class="w-5 h-5 border-2 border-slate-300 rounded-sm bg-white mt-0.5 shrink-0"></div>
+                                    <div class="text-sm"><span class="bg-yellow-100 text-yellow-800 font-bold px-2 py-0.5 rounded text-xs mr-2">6-7</span> <strong>Satisfactory:</strong> Adequate knowledge. Needs review on technical operations.</div>
+                                </div>
+                                <div class="flex items-start gap-3 p-2 rounded hover:bg-slate-50 border border-transparent transition">
+                                    <div class="w-5 h-5 border-2 border-slate-300 rounded-sm bg-white mt-0.5 shrink-0"></div>
+                                    <div class="text-sm"><span class="bg-red-100 text-red-800 font-bold px-2 py-0.5 rounded text-xs mr-2">< 6</span> <strong>Fail:</strong> Insufficient understanding of core threats and English terminology.</div>
+                                </div>
                             </div>
                             
                             <div class="mt-8 flex justify-between items-end">
-                                <div class="text-xs text-slate-500 font-mono">Exam Date: ____ / ____ / 20__</div>
-                                <div class="w-64 border-b-2 border-slate-900 text-center pb-1 text-xs font-bold text-slate-500 uppercase">Examiner Signature</div>
+                                <div class="text-xs text-slate-500 font-mono">Date: ____ / ____ / 20__</div>
+                                <div class="w-48 border-b border-slate-800 text-center pb-1 text-[10px] font-bold text-slate-500 uppercase">Examiner Signature</div>
                             </div>
                         </div>
                     </div>
+                </div>
+
+                <!-- Footer Pagina PDF -->
+                <div class="mt-8 pt-4 border-t border-slate-100 flex justify-between items-center text-[9px] text-slate-400 font-mono">
+                    <div>Ref: CYB-SEC-EXAM-V2</div>
+                    <div>Page 1 of 1 • Official Documentation</div>
                 </div>
 
             </div>
         </div>
 
         <!-- ========================================== -->
-        <!-- TAB 2: DOCENTE (LOCKED) - TRANSCRIPT       -->
+        <!-- TAB 2: RISORSE DOCENTE (PROTETTO)          -->
         <!-- ========================================== -->
         <div id="tab-transcript" class="tab-content">
-            <div class="bg-white rounded border-t-4 border-red-600 shadow-xl p-10 mb-8">
-                <h2 class="text-3xl font-bold text-slate-900 mb-6 exam-title"><i class="fa-solid fa-language text-red-600 mr-2"></i> Official Transcripts & Study Notes</h2>
-                <p class="text-slate-600 mb-8 font-mono text-sm border-b pb-4">CONFIDENTIAL: For teacher preparation only.</p>
-                
-                <div class="bg-slate-50 p-6 rounded border mb-8 h-96 overflow-y-auto">
-                    <h3 class="font-bold text-lg mb-4 flex items-center sticky top-0 bg-slate-50 pb-2 border-b"><img src="https://flagcdn.com/w40/gb.png" class="h-4 mr-2" alt="EN"> English (Clean Transcript Summary)</h3>
-                    <div class="text-sm leading-relaxed text-slate-700 space-y-4">
-                        <p>Today, we rely on the internet for almost everything. We keep our money, our personal data, our medical records, and our secrets online. This makes cybersecurity a major, critical issue. Cyber attacks cause billions of dollars in damage every single year, affecting individuals, large companies, and even governments. Let's look at some common types of cyber attacks.</p>
-                        <p>First, we have a computer <strong>virus</strong> or malware. A virus is an executable program that gets installed on a device, usually unintentionally by the user, and harms the computer. It can delete files, steal private data, or allow a hacker to take remote control of your system. They often spread by attaching themselves to legitimate-looking files or software downloads.</p>
-                        <p>Another major type of attack is a <strong>DDoS</strong> attack, which stands for <em>Distributed Denial of Service</em>. In a DDoS attack, hackers overwhelm a website or a server with far too many requests at the exact same time. The server gets flooded with fake traffic, causing it to crash or slow down so much that legitimate, real users cannot access the website anymore.</p>
-                        <p>Then there is <strong>Phishing</strong>. Phishing is a social engineering scam where you receive a fake email that looks like it's from a trusted source, such as your bank, a delivery company, or a social media site. The email tricks you into clicking a link and logging in. However, the site you land on is actually a fake replica. When you type in your username and password, the hackers instantly steal your credentials.</p>
-                        <p>To protect yourself on the internet, you should always check the URLs of the websites you visit to ensure they are legitimate, use strong and unique passwords for different accounts, and consistently update your software to patch security vulnerabilities.</p>
+            <div class="bg-white rounded-xl shadow-2xl p-8 mb-10 mt-6 border-t-4 border-cyber-accent">
+                <div class="flex items-center mb-6 border-b pb-4">
+                    <div class="bg-cyber-accent/10 p-3 rounded-lg mr-4">
+                        <i class="fa-solid fa-chalkboard-user text-2xl text-cyber-accent"></i>
+                    </div>
+                    <div>
+                        <h2 class="text-2xl font-extrabold text-slate-800">Teacher Preparation Material</h2>
+                        <p class="text-slate-500 text-sm">Transcripts, lesson summaries, and key concepts.</p>
                     </div>
                 </div>
+                
+                <div class="grid md:grid-cols-2 gap-8">
+                    <!-- English Transcript -->
+                    <div class="bg-slate-50 rounded-xl p-6 border border-slate-200">
+                        <div class="flex items-center mb-4 pb-2 border-b border-slate-200">
+                            <img src="https://flagcdn.com/w40/gb.png" class="h-4 mr-2 rounded-sm shadow-sm" alt="EN">
+                            <h3 class="font-bold text-slate-800">Video Transcript Summary</h3>
+                        </div>
+                        <div class="text-sm text-slate-600 space-y-3 leading-relaxed">
+                            <p>Today, we rely on the internet for almost everything. We keep our money, our personal data, our medical records, and our secrets online. This makes cybersecurity a major issue. Cyber attacks cause billions of dollars in damage every year.</p>
+                            <p>First, we have a computer <strong>virus</strong>. A virus is an executable program that gets installed on a device, usually unintentionally by the user downloading software, and harms the computer or steals private data.</p>
+                            <p>Another type is a <strong>DDoS</strong> attack (Distributed Denial of Service). Hackers overwhelm a website or a server with far too many requests at the exact same time. The server gets flooded with fake traffic, causing it to crash.</p>
+                            <p>Then there is <strong>Phishing</strong>. This is a scam where you receive a fake email that looks like it's from a trusted source, like a bank. It tricks you into clicking a link and logging into a fake replica site, allowing hackers to steal your credentials.</p>
+                        </div>
+                    </div>
 
-                <div class="bg-emerald-50 p-6 rounded border border-emerald-200">
-                    <h3 class="font-bold text-lg mb-4 flex items-center"><img src="https://flagcdn.com/w40/it.png" class="h-4 mr-2" alt="IT"> Riassunto Concetti Chiave (Italian)</h3>
-                    <div class="text-sm leading-relaxed text-slate-700 space-y-4">
-                        <p><strong>L'importanza della Cybersecurity:</strong> Oggi affidiamo alla rete i nostri soldi, dati personali e segreti. Gli attacchi informatici causano danni per miliardi di dollari ogni anno colpendo privati, aziende e governi.</p>
-                        <p><strong>Virus / Malware:</strong> Sono programmi eseguibili che vengono installati (spesso per errore dall'utente stesso) e danneggiano il computer. Possono rubare dati, cancellare file o permettere agli hacker di prendere il controllo remoto della macchina.</p>
-                        <p><strong>Attacchi DDoS (Distributed Denial of Service):</strong> Un attacco in cui gli hacker inondano un sito web o un server con un numero enorme di finte richieste simultanee. Questo traffico anomalo sovraccarica il server, causandone il blocco o il crash, e impedendo agli utenti reali di accedere al servizio.</p>
-                        <p><strong>Phishing:</strong> È una truffa basata sull'inganno (ingegneria sociale). L'utente riceve un'email falsa che sembra provenire da un ente affidabile (es. la propria banca). L'email invita a cliccare un link che porta a un sito clone identico all'originale. Inserendo le credenziali su questo sito falso, l'utente regala la propria password agli hacker.</p>
-                        <p><strong>Prevenzione:</strong> Per difendersi è fondamentale controllare sempre gli URL dei siti web, usare password forti e diverse, e mantenere il software costantemente aggiornato per correggere le falle di sicurezza.</p>
+                    <!-- Italian Summary -->
+                    <div class="bg-blue-50/50 rounded-xl p-6 border border-blue-100">
+                        <div class="flex items-center mb-4 pb-2 border-b border-blue-200">
+                            <img src="https://flagcdn.com/w40/it.png" class="h-4 mr-2 rounded-sm shadow-sm" alt="IT">
+                            <h3 class="font-bold text-blue-900">Appunti per la Lezione CLIL</h3>
+                        </div>
+                        <div class="text-sm text-blue-800/80 space-y-3 leading-relaxed">
+                            <p><strong class="text-blue-900">Virus / Malware:</strong> Programmi eseguibili installati spesso per errore dall'utente (scaricando file fasulli). Danneggiano il PC o rubano dati in background.</p>
+                            <p><strong class="text-blue-900">DDoS (Distributed Denial of Service):</strong> Tecnica che consiste nell'inviare milioni di finte richieste simultanee a un server. Il server si sovraccarica, si blocca (crash) e gli utenti reali non riescono più ad accedere al sito web.</p>
+                            <p><strong class="text-blue-900">Phishing:</strong> Ingegneria sociale pura. L'hacker invia un'email che finge di essere la tua banca. Clicchi il link, atterri su un sito identico a quello vero, inserisci nome utente e password... e glieli regali.</p>
+                            <p><strong class="text-blue-900">Prevenzione (Mitigation):</strong> Controllare sempre l'URL (indirizzo web) prima di fare login, usare password diverse, e tenere il software aggiornato per chiudere le "falle" (vulnerabilities).</p>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -395,178 +480,161 @@
 
     </div>
 
-    <!-- SCRIPT & LOGIC PROCEDURALE -->
+    <!-- SCRIPT PRINCIPALE -->
     <script>
-        // --- ANTI-CHEAT (BLINDATURA) ---
-        document.addEventListener('contextmenu', event => event.preventDefault()); 
-        document.addEventListener('copy', event => event.preventDefault());        
-        document.addEventListener('paste', event => event.preventDefault());       
-        document.addEventListener('cut', event => event.preventDefault());         
-        document.addEventListener('keydown', function(e) {
-            if (e.ctrlKey && (e.key === 'c' || e.key === 'v' || e.key === 'u' || e.key === 'p')) {
-                e.preventDefault();
-            }
-        });
-
-        // --- SICUREZZA DOCENTE ---
+        // --- 1. CONFIGURAZIONE E SICUREZZA ---
+        const TEACHER_PASSWORD = "admin"; // Cambiata per facilità di test
         let isTeacherMode = false;
         let pendingTab = null;
-        const TEACHER_PASSWORD = "sistemi5"; 
 
-        // --- DATABASES ---
+        // Anti-Cheat Basico (Disattivabile dal docente se serve)
+        document.addEventListener('contextmenu', e => e.preventDefault()); 
+        document.addEventListener('keydown', e => {
+            if (e.ctrlKey && ['c', 'v', 'p', 's'].includes(e.key.toLowerCase())) e.preventDefault();
+        });
+
+        // --- 2. DATABASE DOMANDE (Cybersecurity) ---
         const mcqBank = [
             { q: "What does the acronym DDoS stand for?", options: ["Data Distribution of Software", "Distributed Denial of Service", "Digital Defense of Systems", "Direct Download of Server"], a: "Distributed Denial of Service" },
-            { q: "What is the primary goal of a Phishing attack?", options: ["To physically destroy a computer's hard drive", "To overwhelm a server with fake traffic", "To trick users into giving away their passwords", "To speed up internet connections"], a: "To trick users into giving away their passwords" },
-            { q: "According to the video, how do computer viruses usually get installed?", options: ["Through hardware manufacturing defects", "They are built into the Wi-Fi router", "By physically stealing the computer", "Usually unintentionally by the user downloading an executable program"], a: "Usually unintentionally by the user downloading an executable program" },
-            { q: "What happens to a server during a DDoS attack?", options: ["It gets flooded with too many requests and crashes", "It encrypts all user passwords automatically", "It upgrades its security protocols", "It tracks the hacker's physical location"], a: "It gets flooded with too many requests and crashes" },
-            { q: "Which of the following is recommended to protect yourself from cyber attacks?", options: ["Using the same password for all accounts", "Clicking on all email links to verify them", "Checking URLs carefully and keeping software updated", "Sharing your passwords only with friends"], a: "Checking URLs carefully and keeping software updated" },
-            { q: "Why is cybersecurity considered a major global issue today?", options: ["Because cyber attacks cause billions of dollars in damage yearly", "Because people prefer using cash", "Because computers are becoming too expensive", "Because the internet is running out of IP addresses"], a: "Because cyber attacks cause billions of dollars in damage yearly" }
+            { q: "What is the primary goal of a Phishing attack?", options: ["To physically destroy hardware", "To overwhelm a server with traffic", "To trick users into giving away passwords", "To speed up internet connections"], a: "To trick users into giving away passwords" },
+            { q: "How do computer viruses usually get installed?", options: ["Through hardware defects", "Built into the Wi-Fi router", "Usually unintentionally by the user downloading a program", "By typing too fast on the keyboard"], a: "Usually unintentionally by the user downloading a program" },
+            { q: "What happens to a server during a DDoS attack?", options: ["It gets flooded with requests and crashes", "It encrypts all user passwords", "It upgrades its security", "It tracks the hacker's location"], a: "It gets flooded with requests and crashes" }
         ];
 
         const tfBank = [
-            { statement: "A virus is a piece of physical hardware that breaks your computer's screen.", ans: "False", just: "A virus is an executable software program, not a physical piece of hardware." },
-            { statement: "Phishing attacks often rely on fake emails that look like they come from trusted sources like banks.", ans: "True", just: "Hackers use deceptive emails to trick users into trusting a fake login page." },
-            { statement: "During a DDoS attack, hackers secretly steal data without the server noticing.", ans: "False", just: "A DDoS attack makes the server crash by overwhelming it with fake traffic." },
-            { statement: "Updating your software regularly is one way to patch security vulnerabilities.", ans: "True", just: "Software updates often contain fixes for known security holes." }
+            { statement: "Phishing attacks often rely on fake emails that look like they come from trusted banks.", ans: "True", just: "Hackers use deceptive emails to trick users into trusting a fake login page." },
+            { statement: "During a DDoS attack, hackers secretly steal data without the server noticing.", ans: "False", just: "A DDoS attack makes the server crash by overwhelming it with fake traffic, it's not a stealth data theft." }
         ];
 
-        const sequenceBank = [
-            {
-                title: "Order the chronological steps of a typical Phishing Attack:",
-                steps: [
-                    "The hacker sends a fake email posing as a trusted bank.",
-                    "The user clicks the malicious link in the email.",
-                    "The user lands on a fake replica website and types their password.",
-                    "The hacker captures the stolen credentials and accesses the real account."
-                ]
-            }
-        ];
+        const sequenceBank = {
+            title: "Order the chronological steps of a typical Phishing Attack:",
+            steps: [
+                "Hacker sends a fake email posing as a trusted entity.",
+                "User clicks the malicious link provided in the email.",
+                "User lands on a replica website and types their credentials.",
+                "Hacker captures the data and accesses the real account."
+            ]
+        };
 
         const matchesBank = [
-            {t: "Virus", d: "An executable program that harms the computer or steals data."},
-            {t: "DDoS", d: "An attack that crashes a server by flooding it with too many requests."},
-            {t: "Phishing", d: "A scam using fake emails to trick users into revealing passwords."},
-            {t: "Credentials", d: "Usernames and passwords used to log into an account."},
-            {t: "URL", d: "The web address you should check to ensure a site is legitimate."}
+            {t: "Virus", d: "An executable program that harms the computer."},
+            {t: "DDoS", d: "An attack that crashes a server via traffic flood."},
+            {t: "Phishing", d: "A scam using fake emails to steal passwords."},
+            {t: "URL", d: "The web address you must check for legitimacy."}
         ];
 
-        const acronymBank = [
-            { acr: "DDoS", meaning: "Distributed Denial of Service" },
-            { acr: "URL", meaning: "Uniform Resource Locator" },
-            { acr: "IT", meaning: "Information Technology" }
-        ];
+        const troubleshootingBank = { 
+            sc: "A popular video game goes offline. Servers are receiving millions of fake connection requests per second, blocking real players.", 
+            ans: "DDoS Attack", 
+            reason: "The server is being overwhelmed by a flood of fake traffic, causing a Denial of Service." 
+        };
 
-        const troubleshootingBank = [
-            { sc: "A popular online video game goes offline. The game's servers are receiving millions of fake connection requests per second, blocking real players. What type of attack is this?", ans: "DDoS Attack", reason: "The server is being overwhelmed by a flood of fake traffic, causing a Denial of Service." },
-            { sc: "You receive an email saying 'Your account is locked! Click here'. The link takes you to 'www.paypaI-secure-login.com'. What attack is this?", ans: "Phishing Attack", reason: "The email is a scam trying to steal your credentials via a replica website." }
-        ];
+        // --- 3. FUNZIONI DI SUPPORTO ---
+        const shuffle = arr => arr.sort(() => Math.random() - 0.5);
+        const generateId = () => 'CYB-' + Math.random().toString(36).substring(2,6).toUpperCase() + '-' + Math.random().toString(36).substring(2,6).toUpperCase();
 
-        // --- LOGICA DI GENERAZIONE ---
-        function shuffle(arr) { return arr.sort(() => Math.random() - 0.5); }
-        
-        function generateId() {
-            const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
-            let id = 'CYB-';
-            for(let i=0; i<4; i++) id += chars.charAt(Math.floor(Math.random() * chars.length));
-            id += '-';
-            for(let i=0; i<4; i++) id += chars.charAt(Math.floor(Math.random() * chars.length));
-            return id;
-        }
-
-        function initApp() {
+        // --- 4. GENERATORE DEL FOGLIO (RENDER HTML) ---
+        function generateWorksheet() {
             const uniqueId = generateId();
             document.getElementById('doc-id').textContent = uniqueId;
             document.getElementById('barcode-display').textContent = uniqueId.replace(/-/g, '');
-            generateWorksheet();
-        }
 
-        // AGGIUNTA CLASSE AVOID-BREAK AD OGNI BLOCCO DOMANDA
-        function generateWorksheet() {
             let html = '';
             let s = 2;
-            const secHead = (title, pts) => `
+            
+            // Helper per gli header di sezione (Bellissimi graficamente)
+            const secHead = (title, pts, icon) => `
                 <div class="avoid-break mb-8">
-                <h3 class="text-xl font-bold text-slate-900 border-b-2 border-slate-900 pb-2 mb-4 flex items-center exam-title">
-                    <span class="bg-slate-900 text-white px-3 py-1 mr-3 text-sm font-mono">PART ${s++}</span> 
-                    ${title} <span class="text-sm font-sans font-normal text-slate-500 ml-auto">[ ${pts} Marks ]</span>
-                </h3>`;
+                <div class="flex items-center mb-5">
+                    <div class="bg-cyber-dark text-white font-mono text-sm font-bold px-3 py-1.5 rounded-l flex items-center shadow-sm">PART ${s++}</div>
+                    <div class="bg-slate-50 text-slate-800 font-bold px-4 py-1.5 flex-1 uppercase tracking-wider text-sm border-y border-r border-slate-200 rounded-r flex items-center shadow-sm">
+                        <i class="${icon} text-cyber-accent mr-2"></i> ${title}
+                    </div>
+                    <div class="ml-4 text-sm font-bold text-slate-400">[ ${pts} Marks ]</div>
+                </div>`;
 
-            // PART 2: MCQ (Ogni domanda racchiusa in avoid-break)
-            const mcqs = shuffle([...mcqBank]).slice(0, 4);
-            html += secHead("Video Comprehension - Multiple Choice", 20);
+            // PART 2: MCQ
+            const mcqs = shuffle([...mcqBank]);
+            html += secHead("Multiple Choice Questions", 20, "fa-solid fa-list-check");
+            html += `<div class="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6 pl-2 border-l-2 border-slate-100">`;
             mcqs.forEach((q, i) => {
-                html += `<div class="avoid-break mb-4"><p class="font-bold text-sm mb-2">${i + 1}. ${q.q}</p><div class="grid grid-cols-2 gap-2 text-sm">`;
+                html += `<div class="avoid-break"><p class="font-bold text-sm text-slate-800 mb-3">${i + 1}. ${q.q}</p><div class="space-y-2 text-sm text-slate-600">`;
                 shuffle([...q.options]).forEach(opt => {
-                    const corr = (opt === q.a) ? '<span class="solution-marker">✓</span>' : '';
-                    html += `<label class="flex items-start gap-2 cursor-pointer"><input type="radio" name="m_${i}" class="mt-1"><span>${opt} ${corr}</span></label>`;
+                    const corr = (opt === q.a) ? '<span class="solution-marker">✓ Correct</span>' : '';
+                    html += `<label class="flex items-start mcq-label cursor-pointer"><input type="radio" name="m_${i}" class="mt-1 mr-3 accent-cyber-accent"><span>${opt} ${corr}</span></label>`;
                 });
                 html += `</div></div>`;
             });
-            html += `</div>`;
+            html += `</div></div>`;
 
-            // PART 3: True/False
-            const tfs = shuffle([...tfBank]).slice(0, 2);
-            html += secHead("True/False & Justification", 15);
-            tfs.forEach((q, i) => {
-                html += `<div class="avoid-break mb-6">
-                    <p class="font-bold text-sm mb-2">${i + 1}. ${q.statement}</p>
-                    <div class="flex gap-4 text-sm font-bold mb-2">
-                        <label><input type="radio" name="tf_${i}"> TRUE</label>
-                        <label><input type="radio" name="tf_${i}"> FALSE</label>
-                        <span class="solution-marker">Ans: ${q.ans}</span>
+            // PART 3: Matching
+            let t=[], d=[], l=['A','B','C','D'];
+            shuffle([...matchesBank]).forEach(m => { t.push(m.t); d.push({txt:m.d, orig:m.t}); }); 
+            d = shuffle(d);
+            
+            html += secHead("Terminology Matching", 20, "fa-solid fa-link");
+            html += `<div class="grid grid-cols-1 md:grid-cols-12 gap-6 pl-2 border-l-2 border-slate-100">
+                <div class="md:col-span-5 space-y-4">`;
+            t.forEach(term => {
+                let ans = ''; d.forEach((def,idx) => { if(def.orig===term) ans=l[idx]; });
+                html += `<div class="flex items-center text-sm"><input type="text" class="match-box mr-4 shadow-sm" maxlength="1"><span class="font-bold text-slate-700 bg-white px-3 py-2 border border-slate-200 rounded shadow-sm w-32">${term}</span><span class="solution-marker ml-3 text-lg">${ans}</span></div>`;
+            });
+            html += `</div><div class="md:col-span-7 space-y-3 bg-slate-50 p-5 rounded-lg border border-slate-200 text-sm shadow-inner">`;
+            d.forEach((def,i) => html += `<div class="flex"><strong class="text-cyber-accent w-6">${l[i]}.</strong> <span class="text-slate-600">${def.txt}</span></div>`);
+            html += `</div></div></div>`;
+
+            // PART 4: Sequencing
+            const steps = shuffle([...sequenceBank.steps]);
+            html += secHead("Attack Sequencing", 15, "fa-solid fa-arrow-down-1-9");
+            html += `<p class="text-sm text-slate-500 italic mb-5 pl-2">${sequenceBank.title}</p><div class="space-y-4 pl-2 border-l-2 border-slate-100">`;
+            steps.forEach(st => {
+                let corr = sequenceBank.steps.indexOf(st) + 1;
+                html += `<div class="flex items-center text-sm avoid-break"><input type="text" class="match-box mr-4 h-10 w-10 text-lg"><span class="bg-white px-4 py-2 border border-slate-200 rounded flex-1 shadow-sm text-slate-700">${st}</span><span class="solution-marker w-20 text-center">Step ${corr}</span></div>`;
+            });
+            html += `</div></div>`;
+
+            // PART 5: True/False + Justification
+            html += secHead("Analysis & Justification", 15, "fa-solid fa-scale-balanced");
+            html += `<div class="space-y-8 pl-2 border-l-2 border-slate-100">`;
+            shuffle([...tfBank]).forEach((q, i) => {
+                html += `<div class="avoid-break bg-white p-4 border border-slate-200 rounded-lg shadow-sm">
+                    <p class="font-bold text-sm text-slate-800 mb-3">${i + 1}. ${q.statement}</p>
+                    <div class="flex gap-6 text-sm font-bold mb-4 text-slate-600">
+                        <label class="flex items-center cursor-pointer hover:text-cyber-accent transition"><input type="radio" name="tf_${i}" class="mr-2 accent-cyber-accent"> TRUE</label>
+                        <label class="flex items-center cursor-pointer hover:text-cyber-accent transition"><input type="radio" name="tf_${i}" class="mr-2 accent-cyber-accent"> FALSE</label>
+                        <span class="solution-marker bg-red-50 px-2 rounded">Ans: ${q.ans}</span>
                     </div>
-                    <div class="text-xs text-slate-500 mb-1">Provide justification based on the video:</div>
+                    <div class="text-[10px] uppercase tracking-widest text-slate-400 mb-1 font-bold">Justification from video:</div>
                     <input type="text" class="line-input">
                     <div class="solution-text">${q.just}</div>
                 </div>`;
             });
-            html += `</div>`;
-
-            // PART 4: Matching
-            let t=[], d=[], l=['A','B','C','D','E'];
-            let selectedMatches = shuffle([...matchesBank]).slice(0, 4);
-            selectedMatches.forEach(m => { t.push(m.t); d.push({txt:m.d, orig:m.t}); }); 
-            d = shuffle(d);
-            
-            html += secHead("Cyber Terminology Matching", 15) + `<div class="grid grid-cols-2 gap-8 avoid-break">
-                <div class="space-y-3">`;
-            t.forEach(term => {
-                let ans = ''; d.forEach((def,idx) => { if(def.orig===term) ans=l[idx]; });
-                html += `<div class="flex items-center text-sm"><input type="text" class="match-box mr-3" maxlength="1"><span class="font-bold w-24">${term}</span><span class="solution-marker">(${ans})</span></div>`;
-            });
-            html += `</div><div class="space-y-3 bg-slate-50 p-4 border text-sm">`;
-            d.forEach((def,i) => html += `<div><strong class="text-blue-700">${l[i]}.</strong> ${def.txt}</div>`);
-            html += `</div></div></div>`;
-
-            // PART 5: Sequencing
-            const seq = shuffle([...sequenceBank])[0];
-            const steps = shuffle([...seq.steps]);
-            html += secHead("Attack Process Sequencing", 15) + `<p class="text-sm italic mb-4">${seq.title}</p><div class="space-y-3 avoid-break">`;
-            steps.forEach(st => {
-                let corr = seq.steps.indexOf(st) + 1;
-                html += `<div class="flex items-center text-sm"><input type="text" class="match-box mr-3"><span class="border-b border-slate-300 pb-1 flex-1">${st}</span><span class="solution-marker">Step ${corr}</span></div>`;
-            });
             html += `</div></div>`;
 
-            // PART 6: Acronyms
-            const acrs = shuffle([...acronymBank]).slice(0, 3);
-            html += secHead("Acronym Expansion", 10) + `<div class="grid grid-cols-2 gap-6 avoid-break">`;
-            acrs.forEach(a => {
-                html += `<div class="text-sm font-bold flex flex-col">${a.acr}: <input type="text" class="line-input mt-1"><div class="solution-text">${a.meaning}</div></div>`;
-            });
-            html += `</div></div>`;
-
-            // PART 7: Troubleshooting
-            const tb = shuffle([...troubleshootingBank])[0];
-            html += secHead("Security Scenario Analysis", 15) + `<div class="avoid-break bg-slate-100 p-4 border border-slate-300 font-mono text-sm mb-4">SCENARIO: ${tb.sc}</div>
-                <div class="avoid-break mb-4"><div class="text-sm font-bold">1. Identify the specific cyber attack:</div><input type="text" class="line-input mb-2"><div class="solution-text mb-4">${tb.ans}</div></div>
-                <div class="avoid-break"><div class="text-sm font-bold">2. Explain the mechanism based on the video:</div><input type="text" class="line-input"><div class="solution-text">${tb.reason}</div></div>
-            </div>`;
+            // PART 6: Troubleshooting Scenario
+            html += secHead("Security Scenario", 20, "fa-solid fa-user-ninja");
+            html += `<div class="bg-slate-800 p-5 rounded-lg border-l-4 border-cyber-accent text-white font-mono text-sm mb-5 shadow-lg relative overflow-hidden">
+                <i class="fa-solid fa-triangle-exclamation absolute -right-4 -bottom-4 text-6xl text-white/5"></i>
+                <span class="text-cyber-accent font-bold">INCIDENT REPORT:</span> ${troubleshootingBank.sc}
+            </div>
+            <div class="pl-2 border-l-2 border-slate-100 space-y-5">
+                <div class="avoid-break">
+                    <div class="text-sm font-bold text-slate-700 mb-2">1. Identify the specific cyber attack:</div>
+                    <input type="text" class="line-input text-lg font-bold text-cyber-dark">
+                    <div class="solution-text">${troubleshootingBank.ans}</div>
+                </div>
+                <div class="avoid-break">
+                    <div class="text-sm font-bold text-slate-700 mb-2">2. Explain the mechanism causing the outage:</div>
+                    <input type="text" class="line-input">
+                    <input type="text" class="line-input mt-2">
+                    <div class="solution-text">${troubleshootingBank.reason}</div>
+                </div>
+            </div></div>`;
 
             document.getElementById('dynamic-exercises').innerHTML = html;
         }
 
-        // --- TABS & AUTH ---
+        // --- 5. GESTIONE UI TABS E MODALI ---
         function requestTabAccess(tabId) {
             if (tabId === 'worksheet' || isTeacherMode) { switchTab(tabId); } 
             else {
@@ -581,10 +649,16 @@
             if (document.getElementById('tab-pwd').value === TEACHER_PASSWORD) {
                 isTeacherMode = true;
                 closeAuthModal();
-                document.querySelectorAll('.fa-lock').forEach(i => { i.classList.replace('fa-lock', 'fa-unlock'); i.classList.replace('text-red-400', 'text-emerald-400'); });
-                document.querySelectorAll('.locked-tab').forEach(el => el.classList.remove('locked-tab'));
+                const lockIcon = document.getElementById('icon-transcript');
+                lockIcon.classList.replace('fa-lock', 'fa-unlock'); 
+                lockIcon.classList.replace('text-cyber-alert', 'text-cyber-success');
+                document.querySelectorAll('.locked-tab').forEach(el => el.classList.remove('locked-tab', 'text-slate-400'));
                 if (pendingTab) switchTab(pendingTab);
-            } else { alert("ACCESS DENIED"); }
+            } else { 
+                const input = document.getElementById('tab-pwd');
+                input.classList.add('border-cyber-alert', 'bg-red-50');
+                setTimeout(() => input.classList.remove('border-cyber-alert', 'bg-red-50'), 500);
+            }
         }
 
         function closeAuthModal() { document.getElementById('auth-modal').classList.add('hidden'); }
@@ -596,7 +670,7 @@
             document.getElementById('btn-'+t).classList.add('active');
         }
 
-        // --- EXPORT PDF (COMPLETAMENTE RISCRITTO PER QUALITA' ESTREMA) ---
+        // --- 6. MOTORE ESPORTAZIONE PDF AVANZATO ---
         function openPdfModal() {
             switchTab('worksheet');
             document.getElementById('pdf-modal').classList.remove('hidden');
@@ -606,58 +680,58 @@
 
         async function processDownload(withSol) {
             if(withSol && document.getElementById('teacher-pwd').value !== TEACHER_PASSWORD) {
-                alert("INVALID EXAMINER PASSWORD"); return;
+                alert("Incorrect Examiner Password"); return;
             }
 
             closePdfModal();
             
-            // Attiva Loader
+            // Attiva overlay di caricamento visivo
             document.body.classList.add('is-loading');
 
-            // Attendi il caricamento totale dei font Google
+            // 1. Aspetta che i font personalizzati (Google Fonts) siano completamente caricati
             await document.fonts.ready;
 
-            // Prepara DOM per foto
-            document.body.classList.add('html2pdf-generating');
+            // 2. Aggiunge la classe magica che formatta il foglio per il PDF (larghezza fissa, niente ombre, ecc)
+            const wrapper = document.getElementById('pdf-content-wrapper');
+            document.body.classList.add('pdf-export-mode');
             
-            if(withSol) {
-                document.getElementById('pdf-content-wrapper').classList.add('solution-active');
-                document.getElementById('solution-watermark').classList.remove('hidden');
-            } else {
-                document.getElementById('pdf-content-wrapper').classList.remove('solution-active');
-                document.getElementById('solution-watermark').classList.add('hidden');
+            // 3. Gestione visualizzazione soluzioni rosse
+            if(withSol) wrapper.classList.add('solution-active');
+
+            // 4. Pausa necessaria per far elaborare al browser i cambi CSS prima di scattare la foto
+            await new Promise(resolve => setTimeout(resolve, 800)); 
+
+            // 5. Opzioni per alta qualità html2pdf
+            const opt = {
+                margin:       [15, 0, 15, 0], // Margini top e bottom (left/right gestiti dal max-width interno)
+                filename:     withSol ? 'KEY_Cybersecurity_CLIL.pdf' : 'EXAM_Cybersecurity_CLIL.pdf',
+                image:        { type: 'jpeg', quality: 1 },
+                html2canvas:  { 
+                    scale: 2,           // Retina quality
+                    useCORS: true,      // Permette icone esterne (fontawesome, bandiere)
+                    letterRendering: true,
+                    scrollY: 0,
+                    windowWidth: 800    // Forza larghezza canvas
+                },
+                jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
+            };
+
+            // 6. Generazione e Download
+            try {
+                await html2pdf().set(opt).from(wrapper).save();
+            } catch (error) {
+                console.error("PDF Generation failed:", error);
+                alert("Errore durante la generazione del PDF.");
+            } finally {
+                // 7. Pulizia finale: riporta il sito alla normalità
+                document.body.classList.remove('pdf-export-mode');
+                document.body.classList.remove('is-loading');
+                wrapper.classList.remove('solution-active');
             }
-
-            // Un timeout per assicurarsi che il DOM abbia applicato la classe di generazione
-            setTimeout(() => {
-                const element = document.getElementById('pdf-content-wrapper');
-                const opt = {
-                    margin:       [15, 10, 15, 10], // Margini A4 puliti (top, left, bottom, right) in mm
-                    filename:     withSol ? 'KEY_Exam_CLIL_Cybersecurity.pdf' : 'BLANK_Exam_CLIL_Cybersecurity.pdf',
-                    image:        { type: 'jpeg', quality: 1 },
-                    html2canvas:  { 
-                        scale: 2,           // Qualità alta (retina)
-                        useCORS: true,      // Permette font e immagini esterne
-                        letterRendering: true,
-                        scrollY: 0          // Risolve bug scroll
-                    },
-                    jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
-                };
-
-                html2pdf().set(opt).from(element).save().then(() => {
-                    // Ripristino grafica normale per lo schermo
-                    document.body.classList.remove('html2pdf-generating');
-                    document.body.classList.remove('is-loading');
-                    
-                    if(withSol) {
-                        document.getElementById('pdf-content-wrapper').classList.remove('solution-active');
-                        document.getElementById('solution-watermark').classList.add('hidden');
-                    }
-                });
-            }, 500); // 500ms delay per forzare il reflow del browser
         }
 
-        window.onload = initApp;
+        // Init all'avvio
+        window.onload = generateWorksheet;
     </script>
 </body>
 </html>
