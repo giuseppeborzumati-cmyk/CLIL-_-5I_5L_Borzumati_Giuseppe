@@ -1,737 +1,709 @@
 <!DOCTYPE html>
-<html lang="en" translate="no" class="notranslate">
+<html lang="en" translate="no">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="google" content="notranslate">
-    <title>Official CLIL Examination - Cybersecurity</title>
-    
-    <!-- Librerie: Tailwind (con config per colori custom), HTML2PDF, FontAwesome -->
+    <title>CLIL Assessment: Advanced Networking</title>
+    <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    colors: {
-                        cyber: {
-                            dark: '#0f172a',
-                            light: '#1e293b',
-                            accent: '#06b6d4', // Cyan
-                            alert: '#ef4444',  // Red
-                            success: '#10b981' // Emerald
-                        }
-                    }
-                }
-            }
-        }
-    </script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    <!-- FontAwesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&family=Merriweather:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+    <!-- jsPDF -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+
     <style>
-        /* IMPORT FONT PROFESSIONALI */
-        @import url('https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,400;0,600;0,800;1,400&family=Noto+Serif:ital,wght@0,400;0,700;1,400&family=JetBrains+Mono:wght@400;700&family=Libre+Barcode+39&display=swap');
-        
-        /* IMPOSTAZIONI BASE E ANTI-CHEAT */
+        :root {
+            --primary: #1e3a8a;
+            --accent: #d97706;
+        }
         body {
-            font-family: 'Montserrat', sans-serif;
-            background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
-            background-attachment: fixed;
-            min-height: 100vh;
-            -webkit-touch-callout: none;
-            -webkit-user-select: none;
-            -ms-user-select: none;
-            user-select: none;
+            font-family: 'Inter', sans-serif;
+            background-color: #f1f5f9;
+            user-select: none !important;
+            -webkit-user-select: none !important;
         }
-
-        /* TIPOGRAFIA SPECIFICA */
-        .font-serif { font-family: 'Noto Serif', serif; }
-        .font-mono { font-family: 'JetBrains Mono', monospace; }
-        .barcode { font-family: 'Libre Barcode 39', cursive; font-size: 3.5rem; line-height: 0.8; color: #0f172a; }
-
-        /* FOGLIO D'ESAME SU SCHERMO */
-        .exam-paper {
-            background-color: #ffffff;
-            padding: 4rem 5rem;
-            box-shadow: 0 25px 50px -12px rgba(0,0,0,0.5), 0 0 0 1px rgba(255,255,255,0.1);
-            max-width: 950px;
-            margin: 2rem auto;
+        .serif-title { font-family: 'Merriweather', serif; }
+        
+        #auth-modal, #global-modal { backdrop-filter: blur(15px); }
+        
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: #f1f1f1; }
+        ::-webkit-scrollbar-thumb { background: #94a3b8; border-radius: 4px; }
+        
+        .video-wrapper {
             position: relative;
-            border-top: 12px solid #06b6d4; /* Accento Cyan */
-            border-radius: 4px;
+            padding-bottom: 56.25%; 
+            height: 0;
+            border-radius: 0.75rem;
+            overflow: hidden;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+            background: #000;
+            border: 4px solid #1e3a8a;
+        }
+        .video-wrapper iframe {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: none;
         }
 
-        /* STILI DEGLI INPUT (Per lo studente) */
-        .student-input {
+        /* Input selezionabili */
+        textarea, input[type="text"], input[type="date"], input[type="radio"], select {
+            user-select: auto !important;
+            -webkit-user-select: auto !important;
+        }
+
+        .fill-blank-input {
             border: none;
-            border-bottom: 2px solid #cbd5e1;
-            background: transparent;
-            width: 100%;
-            font-family: 'JetBrains Mono', monospace;
-            font-size: 1.1rem;
-            padding: 4px 8px;
-            color: #0f172a;
-            font-weight: 600;
-            transition: border-color 0.3s;
-        }
-        .student-input:focus { outline: none; border-bottom-color: #06b6d4; }
-
-        .line-input {
-            border: none;
-            border-bottom: 2px dashed #94a3b8;
-            width: 100%;
-            background: rgba(248, 250, 252, 0.5);
-            padding: 6px 8px;
-            font-family: 'Montserrat', sans-serif;
-        }
-        .line-input:focus { outline: none; border-bottom: 2px solid #06b6d4; background: #f0fdfa; }
-
-        .match-box {
-            width: 45px;
-            height: 45px;
-            border: 2px solid #0f172a;
-            border-radius: 8px;
+            border-bottom: 3px dashed #1e3a8a;
+            background: rgba(30, 58, 138, 0.05);
+            padding: 4px 10px;
             text-align: center;
-            font-weight: 800;
-            text-transform: uppercase;
-            font-size: 1.2rem;
-            background-color: #f8fafc;
-            color: #06b6d4;
-            box-shadow: inset 0 2px 4px rgba(0,0,0,0.05);
+            font-weight: 700;
+            color: #1e3a8a;
+            outline: none;
+            width: 180px;
+            transition: all 0.3s;
+            border-radius: 4px 4px 0 0;
+        }
+        .fill-blank-input:focus { border-bottom-style: solid; border-bottom-color: #d97706; background: rgba(217, 119, 6, 0.1); }
+
+        .letter-badge {
+            display: inline-flex; align-items: center; justify-content: center;
+            width: 28px; height: 28px; background: #1e3a8a; color: white;
+            border-radius: 50%; font-weight: bold; font-size: 14px;
         }
 
-        /* TABS UI */
-        .tab-content { display: none; animation: fadeIn 0.4s ease; }
-        .tab-content.active { display: block; }
-        .tab-btn { opacity: 0.6; transition: all 0.3s; }
-        .tab-btn.active { opacity: 1; border-bottom: 4px solid #06b6d4; color: white; background: rgba(255,255,255,0.05); }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-
-        /* =========================================================
-           MOTORE DI STAMPA PDF (IL SEGRETO PER LA PERFEZIONE)
-           ========================================================= */
-        
-        /* La classe viene aggiunta via JS un millisecondo prima di creare il PDF */
-        .pdf-export-mode .exam-paper {
-            max-width: 800px !important; /* Forza larghezza A4 a 96dpi (circa) */
-            width: 800px !important;
-            padding: 0 !important; /* I padding esterni li gestisce html2pdf sui margini */
-            box-shadow: none !important;
-            border-radius: 0 !important;
-            margin: 0 !important;
-            border-top: 8px solid #06b6d4 !important; /* Mantiene la linea colorata */
-        }
-
-        .pdf-export-mode .hide-on-print { display: none !important; }
-        .pdf-export-mode .show-on-print { display: block !important; }
-        
-        /* Box colorati e sfondi nel PDF: Forza la stampa dei colori */
-        .pdf-export-mode * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
-
-        /* Gestione dei tagli pagina: Cruciale! */
-        .avoid-break {
-            page-break-inside: avoid !important;
-            break-inside: avoid !important;
-            margin-bottom: 2rem !important; /* Spazio respiro nel PDF */
-        }
-
-        /* Fix Video su PDF: nascondi l'iframe, mostra il banner elegante */
-        .pdf-export-mode iframe { display: none !important; }
-        .show-on-print { display: none; }
-
-        /* =========================================================
-           MODALITÀ SOLUZIONI (DOCENTE)
-           ========================================================= */
-        .solution-marker { display: none; color: #ef4444; font-weight: 800; margin-left: 10px; font-family: 'JetBrains Mono', monospace; font-size: 0.9rem;}
-        .solution-text { display: none; color: #ef4444; font-family: 'JetBrains Mono', monospace; font-size: 0.95rem; margin-top: 6px; border-left: 4px solid #ef4444; padding-left: 12px; background: #fef2f2; padding-top: 4px; padding-bottom: 4px;}
-        
-        .solution-active .solution-marker { display: inline-block !important; }
-        .solution-active .solution-text { display: block !important; }
-        .solution-active .match-box { color: #ef4444 !important; border-color: #ef4444 !important; background: #fef2f2 !important; }
-        .solution-active input[type="radio"]:checked + span { font-weight: bold; color: #ef4444 !important; text-decoration: underline; }
-        .solution-active .line-input { border-bottom: 2px solid #ef4444 !important; background: #fef2f2 !important; }
-
-        /* UI Element: Checkbox custom per MCQ */
-        .mcq-label { transition: background-color 0.2s; border-radius: 6px; padding: 6px; border: 1px solid transparent; }
-        .mcq-label:hover { background-color: #f8fafc; border-color: #e2e8f0; }
-
-        /* Loader Overlay */
-        #loading-overlay { display: none; backdrop-filter: blur(8px); }
-        .is-loading #loading-overlay { display: flex; }
-
+        @media print { body { display: none; } }
     </style>
 </head>
-<body class="text-slate-800 pb-20">
+<body class="text-slate-800 antialiased relative min-h-screen flex flex-col" oncontextmenu="return false;">
 
-    <!-- OVERLAY CARICAMENTO PDF -->
-    <div id="loading-overlay" class="fixed inset-0 bg-cyber-dark/80 z-[200] items-center justify-center flex-col">
-        <div class="relative w-24 h-24 mb-6">
-            <div class="absolute inset-0 border-4 border-cyber-accent/20 rounded-full"></div>
-            <div class="absolute inset-0 border-4 border-cyber-accent rounded-full border-t-transparent animate-spin"></div>
-            <i class="fa-solid fa-microchip text-3xl text-cyber-accent absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2"></i>
+    <!-- MODALE GLOBALE -->
+    <div id="global-modal" class="fixed inset-0 z-[100] flex items-center justify-center bg-slate-900/90 hidden backdrop-blur-md">
+        <div class="bg-white p-6 rounded-2xl shadow-2xl max-w-md w-full border-t-4 border-amber-500 transform transition-all">
+            <h3 id="modal-title" class="text-2xl font-bold mb-2 text-blue-900"></h3>
+            <p id="modal-message" class="text-slate-600 mb-6 text-sm leading-relaxed"></p>
+            <div class="flex justify-end gap-3" id="modal-buttons"></div>
         </div>
-        <h2 class="text-white text-2xl font-bold tracking-wider">GENERATING DOCUMENT</h2>
-        <p class="text-cyber-accent mt-2 text-sm font-mono">Compiling High-Res PDF & Aligning Layout...</p>
     </div>
 
-    <!-- HEADER WEB NAVBAR -->
-    <div class="bg-cyber-dark text-white shadow-2xl sticky top-0 z-50 hide-on-print border-b border-slate-700">
-        <div class="max-w-7xl mx-auto px-4">
-            <div class="py-4 flex flex-col md:flex-row justify-between items-center gap-4">
-                <div class="flex items-center gap-4">
-                    <div class="bg-cyber-accent/10 p-3 rounded-lg border border-cyber-accent/30">
-                        <i class="fa-solid fa-shield-virus text-3xl text-cyber-accent"></i>
-                    </div>
-                    <div>
-                        <h1 class="text-xl font-bold tracking-tight text-white">CLIL EXAM GENERATOR v2.0</h1>
-                        <p class="text-slate-400 text-xs font-mono mt-1"><i class="fa-solid fa-user-tie mr-1"></i> Prof. G. Borzumati | Anno di Prova</p>
-                    </div>
+    <!-- NAVBAR -->
+    <nav class="bg-gradient-to-r from-blue-900 to-slate-900 text-white shadow-xl sticky top-0 z-40 border-b-4 border-amber-500">
+        <div class="container mx-auto px-6 py-4 flex justify-between items-center">
+            <div class="flex items-center gap-4">
+                <i class="fa-solid fa-microchip text-3xl text-amber-500"></i>
+                <div>
+                    <h1 class="font-bold tracking-wider text-xl leading-tight">Liceo Scientifico</h1>
+                    <p class="text-xs text-blue-200 uppercase tracking-widest font-semibold">CLIL Dept. - Advanced Assessment Mode</p>
                 </div>
-                <div class="flex gap-3">
-                    <button onclick="location.reload()" class="bg-slate-800 hover:bg-slate-700 text-white px-5 py-2.5 rounded text-sm font-bold transition flex items-center border border-slate-600">
-                        <i class="fa-solid fa-rotate mr-2"></i> Regenerate
-                    </button>
-                    <button onclick="openPdfModal()" class="bg-cyber-accent hover:bg-cyan-400 text-cyber-dark px-6 py-2.5 rounded text-sm font-bold transition shadow-[0_0_15px_rgba(6,182,212,0.4)] flex items-center">
-                        <i class="fa-solid fa-print mr-2"></i> Export PDF
-                    </button>
-                </div>
+            </div>
+            <div class="text-right">
+                <div class="text-sm font-bold text-amber-400 bg-black/30 px-3 py-1 rounded-md" id="test-id-display">ID: Pending</div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- LOGIN -->
+    <div id="auth-modal" class="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/80 backdrop-blur-sm">
+        <div class="bg-white p-8 rounded-2xl shadow-2xl max-w-lg w-full border-t-8 border-blue-900">
+            <div class="text-center mb-6">
+                <i class="fa-solid fa-fingerprint text-5xl text-blue-900 mb-3"></i>
+                <h2 class="text-3xl font-bold serif-title text-slate-800">Exam Authentication</h2>
+                <p class="text-sm text-slate-500 mt-2 font-semibold">Highly Articulated 12-Part Technical Assessment</p>
             </div>
             
-            <!-- TABS -->
-            <div class="flex overflow-x-auto mt-2">
-                <button onclick="requestTabAccess('worksheet')" id="btn-worksheet" class="tab-btn active px-8 py-3 text-sm font-bold uppercase tracking-wider transition whitespace-nowrap">
-                    <i class="fa-solid fa-file-lines mr-2"></i> Exam Paper
-                </button>
-                <button onclick="requestTabAccess('transcript')" id="btn-transcript" class="tab-btn locked-tab px-8 py-3 text-sm font-bold uppercase tracking-wider transition whitespace-nowrap flex items-center text-slate-400">
-                    <i id="icon-transcript" class="fa-solid fa-lock text-cyber-alert mr-2"></i> Teacher Resources
+            <div class="space-y-5">
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-xs font-bold text-slate-600 uppercase mb-1">Name</label>
+                        <input type="text" id="student-name" class="w-full px-4 py-3 bg-slate-50 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none transition-all">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-slate-600 uppercase mb-1">Surname</label>
+                        <input type="text" id="student-surname" class="w-full px-4 py-3 bg-slate-50 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none transition-all">
+                    </div>
+                </div>
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-xs font-bold text-slate-600 uppercase mb-1">Class</label>
+                        <select id="student-class" class="w-full px-4 py-3 bg-slate-50 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none transition-all">
+                            <option value="">Select...</option>
+                            <option value="5I - Scientifico">5I - Scientifico</option>
+                            <option value="5L - Scientifico">5L - Scientifico</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-slate-600 uppercase mb-1">Date</label>
+                        <input type="date" id="student-date" class="w-full px-4 py-3 bg-slate-50 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none transition-all">
+                    </div>
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-slate-600 uppercase mb-1">Authorization Key</label>
+                    <input type="password" id="session-password" class="w-full px-4 py-3 bg-slate-50 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none transition-all text-center tracking-widest text-lg" placeholder="••••">
+                </div>
+                <button onclick="unlockAssessment()" class="w-full bg-gradient-to-r from-blue-900 to-blue-700 hover:from-blue-800 hover:to-blue-600 text-white font-bold py-4 rounded-xl transition-all shadow-lg transform hover:scale-[1.02]">
+                    Initialize Secure Environment <i class="fa-solid fa-lock-open ml-2"></i>
                 </button>
             </div>
         </div>
     </div>
 
-    <!-- MODALI -->
-    <!-- Modale Password Docente -->
-    <div id="auth-modal" class="fixed inset-0 bg-cyber-dark/90 hidden z-[100] flex items-center justify-center backdrop-blur-md">
-        <div class="bg-white rounded-xl shadow-2xl max-w-sm w-full p-8 text-center overflow-hidden relative">
-            <div class="h-2 w-full bg-cyber-alert absolute top-0 left-0"></div>
-            <div class="bg-red-50 w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-4 border border-red-100">
-                <i class="fa-solid fa-user-lock text-3xl text-cyber-alert"></i>
+    <!-- MAIN EXAM -->
+    <main id="main-content" class="container mx-auto px-4 py-8 flex-grow max-w-5xl hidden opacity-0 transition-opacity duration-1000">
+        
+        <header class="text-center mb-10 bg-white p-8 rounded-2xl shadow-md border border-slate-200">
+            <h2 class="text-4xl font-bold serif-title text-blue-900 mb-3">Complex Network Engineering</h2>
+            <p class="text-lg text-slate-600 font-medium">Advanced CLIL Examination - In-depth Articulated Analysis</p>
+            <div id="proctoring-badge" class="mt-5 inline-flex items-center gap-2 bg-emerald-100 text-emerald-800 px-5 py-2 rounded-full text-sm font-bold border border-emerald-300 transition-colors">
+                <i class="fa-solid fa-shield-check"></i> Monitoring Active: 0 Warnings
             </div>
-            <h3 class="text-2xl font-extrabold text-slate-800 mb-2">Examiner Access</h3>
-            <p class="text-sm text-slate-500 mb-6">Restricted area. Authentication required.</p>
-            <input type="password" id="tab-pwd" placeholder="Enter PIN..." class="w-full px-4 py-3 border-2 border-slate-200 rounded-lg mb-6 focus:border-cyber-alert outline-none text-center text-xl font-mono tracking-widest bg-slate-50">
-            <div class="flex gap-3">
-                <button onclick="closeAuthModal()" class="w-1/2 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold py-3 rounded-lg transition">Cancel</button>
-                <button onclick="verifyTabAccess()" class="w-1/2 bg-cyber-alert hover:bg-red-600 text-white font-bold py-3 rounded-lg shadow-lg shadow-red-500/30 transition">Unlock</button>
-            </div>
-        </div>
-    </div>
+        </header>
 
-    <!-- Modale Selezione PDF -->
-    <div id="pdf-modal" class="fixed inset-0 bg-cyber-dark/90 hidden z-[100] flex items-center justify-center backdrop-blur-md">
-        <div class="bg-white rounded-xl shadow-2xl max-w-md w-full p-8 relative overflow-hidden">
-            <div class="h-2 w-full bg-cyber-accent absolute top-0 left-0"></div>
-            <h3 class="text-2xl font-extrabold text-slate-800 mb-2 text-center">Export Document</h3>
-            <p class="text-sm text-slate-500 mb-6 text-center">Select the version you want to generate. The system will optimize layouts for A4 printing.</p>
+        <!-- Video 100% Funzionante -->
+        <section class="mb-12">
+            <div class="bg-white p-6 rounded-3xl shadow-xl border border-slate-200">
+                <div class="flex items-center gap-4 mb-5">
+                    <div class="bg-red-100 p-3 rounded-full"><i class="fa-brands fa-youtube text-red-600 text-3xl"></i></div>
+                    <div>
+                        <h3 class="font-bold text-2xl text-slate-800">Part 1: Core Architecture Source</h3>
+                        <p class="text-sm text-slate-500 uppercase tracking-wider font-semibold">Examine the mechanisms carefully before answering</p>
+                    </div>
+                </div>
+                <div class="video-wrapper">
+                    <!-- URL Robusto e testato per l'embed universally allowed -->
+                    <iframe src="https://www.youtube.com/embed/IPvYRVwR1R4?si=12345&rel=0&modestbranding=1" title="Networking Architecture Video" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+                </div>
+            </div>
+        </section>
+
+        <!-- Area Domande -->
+        <section class="mb-12">
+            <div class="flex items-center justify-between mb-8">
+                <h3 class="text-3xl font-bold text-blue-900 flex items-center gap-3"><i class="fa-solid fa-layer-group text-amber-500"></i> Part 2: Complex Assessment</h3>
+                <span class="text-xs font-bold bg-amber-100 text-amber-800 px-4 py-2 rounded-lg border border-amber-300 uppercase tracking-widest shadow-sm">12 Generative Tasks</span>
+            </div>
             
-            <div class="bg-slate-50 p-4 rounded-lg border border-slate-200 mb-6">
-                <label class="text-xs font-bold text-slate-500 uppercase mb-2 block"><i class="fa-solid fa-key mr-1"></i> Examiner Password (for Answer Key)</label>
-                <input type="password" id="teacher-pwd" placeholder="Leave blank for student version" class="w-full px-4 py-2 border border-slate-300 rounded focus:border-cyber-accent outline-none font-mono">
-            </div>
+            <form id="quiz-form" class="space-y-10">
+                <div id="questions-container" class="space-y-10"></div>
 
-            <div class="flex flex-col gap-3">
-                <button onclick="processDownload(false)" class="w-full bg-white hover:bg-slate-50 text-slate-800 border-2 border-slate-200 font-bold py-4 rounded-lg flex justify-center items-center transition">
-                    <i class="fa-regular fa-file-pdf mr-2 text-cyber-accent text-xl"></i> 
-                    <div>
-                        <div class="text-sm">Blank Student Exam</div>
-                        <div class="text-[10px] text-slate-400 font-normal">Ready for printing</div>
-                    </div>
-                </button>
-                <button onclick="processDownload(true)" class="w-full bg-slate-900 hover:bg-slate-800 text-white font-bold py-4 rounded-lg flex justify-center items-center transition shadow-lg">
-                    <i class="fa-solid fa-check-double mr-2 text-cyber-alert text-xl"></i>
-                    <div>
-                        <div class="text-sm">Examiner Answer Key</div>
-                        <div class="text-[10px] text-slate-400 font-normal">Contains red text solutions</div>
-                    </div>
-                </button>
-                <button onclick="closePdfModal()" class="w-full text-slate-400 hover:text-slate-600 py-2 text-sm mt-2 transition">Cancel</button>
-            </div>
+                <div class="bg-gradient-to-br from-blue-50 to-slate-100 p-10 rounded-3xl border-2 border-dashed border-blue-300 text-center mt-16 shadow-inner">
+                    <i class="fa-solid fa-flag-checkered text-5xl text-blue-900 mb-4 opacity-80"></i>
+                    <h4 class="font-bold text-blue-900 text-2xl mb-3">End of the Assessment Phase</h4>
+                    <p class="text-base text-blue-800 mb-8 max-w-2xl mx-auto font-medium leading-relaxed">Please verify all 12 highly-articulated exercises. Once submitted, the system will generate a detailed Teacher's Master Copy PDF containing your answers, correct technical solutions, and grading rubrics.</p>
+                    <button type="button" onclick="askSubmit()" class="bg-gradient-to-r from-blue-900 to-indigo-900 hover:from-blue-800 hover:to-indigo-800 text-white font-bold py-5 px-12 rounded-full shadow-2xl transition-all transform hover:scale-105 flex items-center justify-center gap-4 mx-auto text-xl border-4 border-white">
+                        <i class="fa-solid fa-file-signature"></i> Generate Graded PDF Master
+                    </button>
+                </div>
+            </form>
+        </section>
+    </main>
+
+    <!-- Overlay Caricamento -->
+    <div id="processing-overlay" class="fixed inset-0 bg-slate-900/95 flex flex-col items-center justify-center z-[110] hidden backdrop-blur-xl transition-all duration-500">
+        <div class="relative">
+            <div class="absolute inset-0 border-t-4 border-amber-500 rounded-full animate-spin"></div>
+            <i class="fa-solid fa-microchip text-7xl text-amber-500 p-8"></i>
+        </div>
+        <h2 class="text-4xl font-bold text-white serif-title mt-6 mb-2">Compiling Master PDF</h2>
+        <p class="text-blue-200 text-lg font-medium">Injecting solutions, generating score boxes, rendering A4 layout...</p>
+        <div class="w-80 h-3 bg-slate-800 rounded-full mt-8 overflow-hidden border border-slate-700 shadow-inner">
+            <div class="h-full bg-gradient-to-r from-amber-600 to-amber-400 animate-pulse" style="width: 100%"></div>
         </div>
     </div>
 
-    <!-- AREA PRINCIPALE CONTENUTI -->
-    <div class="max-w-6xl mx-auto px-4">
-
-        <!-- ========================================== -->
-        <!-- TAB 1: IL FOGLIO D'ESAME                   -->
-        <!-- ========================================== -->
-        <div id="tab-worksheet" class="tab-content active">
-            <!-- Questo è il div che viene "fotografato" -->
-            <div id="pdf-content-wrapper" class="exam-paper">
-                
-                <!-- INTESTAZIONE FOGLIO (Design Premium) -->
-                <div class="avoid-break mb-8 border-b-2 border-slate-200 pb-6 relative">
-                    <!-- Decorazione Background Intestazione -->
-                    <div class="absolute top-0 right-0 opacity-5 pointer-events-none">
-                        <i class="fa-solid fa-shield-halved text-[150px]"></i>
-                    </div>
-
-                    <div class="flex justify-between items-start relative z-10">
-                        <!-- Sinistra: Info Scuola e Titolo -->
-                        <div class="w-2/3">
-                            <div class="flex items-center gap-3 mb-4">
-                                <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/4/4f/European_Union_flag_and_IT_flag.svg/512px-European_Union_flag_and_IT_flag.svg.png" class="h-5" alt="EU/IT">
-                                <div class="text-[10px] font-bold tracking-widest uppercase text-slate-400 bg-slate-100 px-2 py-1 rounded">Ministry of Education - CLIL Framework</div>
-                            </div>
-                            <h1 class="text-4xl font-extrabold text-slate-900 font-serif leading-tight mb-1">
-                                <span class="text-cyber-accent">Cybersecurity</span> & IT Defense
-                            </h1>
-                            <h2 class="text-lg text-slate-500 font-bold uppercase tracking-wider">Paper 2: Digital Threats & Mitigation</h2>
-                        </div>
-                        
-                        <!-- Destra: Codici a barre e ID -->
-                        <div class="w-1/3 text-right">
-                            <div class="barcode mb-2" id="barcode-display">12345678</div>
-                            <div class="bg-slate-50 border border-slate-200 inline-block p-2 rounded text-left">
-                                <p class="font-mono text-xs text-slate-500">BOOKLET ID: <span id="doc-id" class="text-slate-900 font-bold"></span></p>
-                                <p class="font-mono text-[10px] text-slate-400 mt-0.5">TIME ALLOWED: 60 MINS</p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- BOX DATI CANDIDATO -->
-                <div class="avoid-break bg-[#f8fafc] border border-slate-300 rounded-lg p-6 mb-10 relative z-10 shadow-sm">
-                    <div class="absolute -top-3 left-4 bg-[#f8fafc] px-2 text-[10px] font-bold text-slate-400 uppercase tracking-widest">Candidate Details</div>
-                    <div class="grid grid-cols-12 gap-8">
-                        <div class="col-span-12 md:col-span-5">
-                            <label class="block text-xs font-bold text-slate-700 uppercase mb-2">Surname</label>
-                            <input type="text" class="student-input uppercase">
-                        </div>
-                        <div class="col-span-12 md:col-span-5">
-                            <label class="block text-xs font-bold text-slate-700 uppercase mb-2">First Name(s)</label>
-                            <input type="text" class="student-input capitalize">
-                        </div>
-                        <div class="col-span-12 md:col-span-2">
-                            <label class="block text-xs font-bold text-slate-700 uppercase mb-2">Class</label>
-                            <input type="text" class="student-input text-center">
-                        </div>
-                    </div>
-                    <div class="mt-5 pt-4 border-t border-slate-200 flex items-center justify-center text-xs text-slate-500">
-                        <i class="fa-solid fa-circle-info text-cyber-accent mr-2"></i>
-                        <span>Read all instructions carefully. Answer all questions in English based on the video resource provided.</span>
-                    </div>
-                </div>
-
-                <!-- CONTENITORE ESERCIZI -->
-                <div id="exercises-container">
-                    
-                    <!-- Section 1: Video Player / Riquadro Stampa -->
-                    <div class="avoid-break mb-10">
-                        <div class="flex items-center mb-4">
-                            <div class="bg-cyber-dark text-white font-mono text-sm font-bold px-3 py-1 rounded-l">PART 1</div>
-                            <div class="bg-cyber-accent/10 text-cyber-dark font-bold px-4 py-1 flex-1 uppercase tracking-wider text-sm border-y border-r border-cyber-accent/20 rounded-r">
-                                Audio-Visual Comprehension
-                            </div>
-                            <div class="ml-4 text-sm font-bold text-slate-400">[ 10 Marks ]</div>
-                        </div>
-                        
-                        <p class="text-sm text-slate-600 mb-4 pl-2 border-l-2 border-slate-300">
-                            <strong>Instructions:</strong> Watch the documentary "Cybersecurity & Crime". Pay attention to the definitions of malware, DDoS attacks, and phishing techniques.
-                        </p>
-                        
-                        <!-- Web Player -->
-                        <div class="hide-on-print bg-slate-900 p-2 rounded-xl shadow-lg relative group">
-                            <div class="absolute top-4 right-4 bg-red-600 text-white text-[10px] font-bold px-2 py-1 rounded z-10 opacity-80 uppercase tracking-widest"><i class="fa-brands fa-youtube mr-1"></i> Source</div>
-                            <iframe class="w-full h-[400px] rounded-lg" src="https://www.youtube-nocookie.com/embed/AuYNXgO_f3Y?rel=0&modestbranding=1&hl=en&cc_load_policy=1" title="Video" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
-                        </div>
-                        
-                        <!-- Print Fallback (Appare solo nel PDF) -->
-                        <div class="show-on-print bg-slate-50 border-2 border-slate-200 rounded-xl p-6 text-center">
-                            <div class="w-16 h-16 bg-white border border-slate-200 rounded-full flex items-center justify-center mx-auto mb-3 shadow-sm">
-                                <i class="fa-solid fa-play text-2xl text-cyber-accent ml-1"></i>
-                            </div>
-                            <h4 class="font-bold text-slate-800 text-lg">Media Resource Required</h4>
-                            <p class="text-xs text-slate-500 mb-4">The examiner will project the following video or provide access via the URL.</p>
-                            <div class="inline-block bg-white border border-slate-300 px-6 py-3 rounded-lg font-mono text-sm font-bold text-cyber-dark shadow-sm">
-                                <i class="fa-solid fa-link text-slate-400 mr-2"></i> https://youtu.be/AuYNXgO_f3Y
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <!-- JS Inietta Esercizi Qui -->
-                    <div id="dynamic-exercises"></div>
-
-                </div>
-
-                <!-- AREA VALUTAZIONE (DOCENTE) -->
-                <div class="avoid-break mt-16 pt-1 relative" style="page-break-before: auto;">
-                    <!-- Linea di taglio figurata -->
-                    <div class="flex items-center justify-center mb-8 opacity-40">
-                        <div class="h-px bg-slate-800 flex-1"></div>
-                        <i class="fa-solid fa-scissors mx-4 text-slate-800"></i>
-                        <div class="text-xs font-bold tracking-widest uppercase text-slate-800 font-mono">Examiner Use Only</div>
-                        <div class="h-px bg-slate-800 flex-1"></div>
-                    </div>
-                    
-                    <div class="bg-white border-2 border-slate-200 rounded-xl overflow-hidden shadow-sm flex flex-col md:flex-row">
-                        
-                        <!-- Box Voto -->
-                        <div class="md:w-1/3 bg-slate-50 p-6 border-r border-slate-200 flex flex-col justify-center items-center text-center">
-                            <div class="w-12 h-12 bg-cyber-dark rounded-full flex items-center justify-center mb-4">
-                                <i class="fa-solid fa-award text-white text-xl"></i>
-                            </div>
-                            <div class="text-[10px] font-bold uppercase tracking-widest text-slate-500 mb-1">Total Score</div>
-                            <div class="text-6xl font-black font-mono text-slate-800 tracking-tighter">___</div>
-                            <div class="text-sm font-bold text-slate-400 border-t border-slate-300 w-24 pt-1 mt-1">/ 100</div>
-                            
-                            <div class="mt-8 w-full px-4">
-                                <div class="text-[10px] font-bold uppercase tracking-widest text-cyber-accent mb-2">Final Grade (IT System)</div>
-                                <div class="border-b-2 border-slate-800 h-10 w-full text-center text-2xl font-bold text-slate-900 bg-white"></div>
-                            </div>
-                        </div>
-
-                        <!-- Box Rubrica Valutazione -->
-                        <div class="md:w-2/3 p-6 bg-white">
-                            <h4 class="font-bold text-slate-800 uppercase text-sm mb-4 border-b pb-2"><i class="fa-solid fa-clipboard-list text-slate-400 mr-2"></i> Evaluation Rubric</h4>
-                            
-                            <div class="space-y-3">
-                                <div class="flex items-start gap-3 p-2 rounded hover:bg-slate-50 border border-transparent transition">
-                                    <div class="w-5 h-5 border-2 border-slate-300 rounded-sm bg-white mt-0.5 shrink-0"></div>
-                                    <div class="text-sm"><span class="bg-emerald-100 text-emerald-800 font-bold px-2 py-0.5 rounded text-xs mr-2">9-10</span> <strong>Outstanding:</strong> Flawless understanding of malware, DDoS, and phishing mechanisms.</div>
-                                </div>
-                                <div class="flex items-start gap-3 p-2 rounded hover:bg-slate-50 border border-transparent transition">
-                                    <div class="w-5 h-5 border-2 border-slate-300 rounded-sm bg-white mt-0.5 shrink-0"></div>
-                                    <div class="text-sm"><span class="bg-blue-100 text-blue-800 font-bold px-2 py-0.5 rounded text-xs mr-2">8</span> <strong>Very Good:</strong> Strong understanding of digital defense concepts. Minor inaccuracies.</div>
-                                </div>
-                                <div class="flex items-start gap-3 p-2 rounded hover:bg-slate-50 border border-transparent transition">
-                                    <div class="w-5 h-5 border-2 border-slate-300 rounded-sm bg-white mt-0.5 shrink-0"></div>
-                                    <div class="text-sm"><span class="bg-yellow-100 text-yellow-800 font-bold px-2 py-0.5 rounded text-xs mr-2">6-7</span> <strong>Satisfactory:</strong> Adequate knowledge. Needs review on technical operations.</div>
-                                </div>
-                                <div class="flex items-start gap-3 p-2 rounded hover:bg-slate-50 border border-transparent transition">
-                                    <div class="w-5 h-5 border-2 border-slate-300 rounded-sm bg-white mt-0.5 shrink-0"></div>
-                                    <div class="text-sm"><span class="bg-red-100 text-red-800 font-bold px-2 py-0.5 rounded text-xs mr-2">< 6</span> <strong>Fail:</strong> Insufficient understanding of core threats and English terminology.</div>
-                                </div>
-                            </div>
-                            
-                            <div class="mt-8 flex justify-between items-end">
-                                <div class="text-xs text-slate-500 font-mono">Date: ____ / ____ / 20__</div>
-                                <div class="w-48 border-b border-slate-800 text-center pb-1 text-[10px] font-bold text-slate-500 uppercase">Examiner Signature</div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Footer Pagina PDF -->
-                <div class="mt-8 pt-4 border-t border-slate-100 flex justify-between items-center text-[9px] text-slate-400 font-mono">
-                    <div>Ref: CYB-SEC-EXAM-V2</div>
-                    <div>Page 1 of 1 • Official Documentation</div>
-                </div>
-
-            </div>
-        </div>
-
-        <!-- ========================================== -->
-        <!-- TAB 2: RISORSE DOCENTE (PROTETTO)          -->
-        <!-- ========================================== -->
-        <div id="tab-transcript" class="tab-content">
-            <div class="bg-white rounded-xl shadow-2xl p-8 mb-10 mt-6 border-t-4 border-cyber-accent">
-                <div class="flex items-center mb-6 border-b pb-4">
-                    <div class="bg-cyber-accent/10 p-3 rounded-lg mr-4">
-                        <i class="fa-solid fa-chalkboard-user text-2xl text-cyber-accent"></i>
-                    </div>
-                    <div>
-                        <h2 class="text-2xl font-extrabold text-slate-800">Teacher Preparation Material</h2>
-                        <p class="text-slate-500 text-sm">Transcripts, lesson summaries, and key concepts.</p>
-                    </div>
-                </div>
-                
-                <div class="grid md:grid-cols-2 gap-8">
-                    <!-- English Transcript -->
-                    <div class="bg-slate-50 rounded-xl p-6 border border-slate-200">
-                        <div class="flex items-center mb-4 pb-2 border-b border-slate-200">
-                            <img src="https://flagcdn.com/w40/gb.png" class="h-4 mr-2 rounded-sm shadow-sm" alt="EN">
-                            <h3 class="font-bold text-slate-800">Video Transcript Summary</h3>
-                        </div>
-                        <div class="text-sm text-slate-600 space-y-3 leading-relaxed">
-                            <p>Today, we rely on the internet for almost everything. We keep our money, our personal data, our medical records, and our secrets online. This makes cybersecurity a major issue. Cyber attacks cause billions of dollars in damage every year.</p>
-                            <p>First, we have a computer <strong>virus</strong>. A virus is an executable program that gets installed on a device, usually unintentionally by the user downloading software, and harms the computer or steals private data.</p>
-                            <p>Another type is a <strong>DDoS</strong> attack (Distributed Denial of Service). Hackers overwhelm a website or a server with far too many requests at the exact same time. The server gets flooded with fake traffic, causing it to crash.</p>
-                            <p>Then there is <strong>Phishing</strong>. This is a scam where you receive a fake email that looks like it's from a trusted source, like a bank. It tricks you into clicking a link and logging into a fake replica site, allowing hackers to steal your credentials.</p>
-                        </div>
-                    </div>
-
-                    <!-- Italian Summary -->
-                    <div class="bg-blue-50/50 rounded-xl p-6 border border-blue-100">
-                        <div class="flex items-center mb-4 pb-2 border-b border-blue-200">
-                            <img src="https://flagcdn.com/w40/it.png" class="h-4 mr-2 rounded-sm shadow-sm" alt="IT">
-                            <h3 class="font-bold text-blue-900">Appunti per la Lezione CLIL</h3>
-                        </div>
-                        <div class="text-sm text-blue-800/80 space-y-3 leading-relaxed">
-                            <p><strong class="text-blue-900">Virus / Malware:</strong> Programmi eseguibili installati spesso per errore dall'utente (scaricando file fasulli). Danneggiano il PC o rubano dati in background.</p>
-                            <p><strong class="text-blue-900">DDoS (Distributed Denial of Service):</strong> Tecnica che consiste nell'inviare milioni di finte richieste simultanee a un server. Il server si sovraccarica, si blocca (crash) e gli utenti reali non riescono più ad accedere al sito web.</p>
-                            <p><strong class="text-blue-900">Phishing:</strong> Ingegneria sociale pura. L'hacker invia un'email che finge di essere la tua banca. Clicchi il link, atterri su un sito identico a quello vero, inserisci nome utente e password... e glieli regali.</p>
-                            <p><strong class="text-blue-900">Prevenzione (Mitigation):</strong> Controllare sempre l'URL (indirizzo web) prima di fare login, usare password diverse, e tenere il software aggiornato per chiudere le "falle" (vulnerabilities).</p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-    </div>
-
-    <!-- SCRIPT PRINCIPALE -->
     <script>
-        // --- 1. CONFIGURAZIONE E SICUREZZA ---
-        const TEACHER_PASSWORD = "admin"; // Cambiata per facilità di test
-        let isTeacherMode = false;
-        let pendingTab = null;
+        const STUDENT_PWD = "clil"; 
+        const MAX_WARNINGS = 2;
+        
+        let testUniqueId = "";
+        let generatedQuestions = []; 
+        let studentData = {};
+        let cheatWarnings = 0;
+        let testUnlocked = false;
 
-        // Anti-Cheat Basico (Disattivabile dal docente se serve)
-        document.addEventListener('contextmenu', e => e.preventDefault()); 
-        document.addEventListener('keydown', e => {
-            if (e.ctrlKey && ['c', 'v', 'p', 's'].includes(e.key.toLowerCase())) e.preventDefault();
-        });
+        const Modal = {
+            show: function(title, message, type, callback) {
+                const modal = document.getElementById('global-modal');
+                document.getElementById('modal-title').innerText = title;
+                document.getElementById('modal-message').innerText = message;
+                const btns = document.getElementById('modal-buttons');
+                btns.innerHTML = '';
+                
+                if (type === 'alert') {
+                    btns.innerHTML = `<button id="m-ok" class="bg-blue-900 hover:bg-blue-800 text-white px-6 py-2 rounded-lg font-bold transition-colors">Understood</button>`;
+                    document.getElementById('m-ok').onclick = () => { modal.classList.add('hidden'); if(callback) callback(true); };
+                } else if (type === 'confirm') {
+                    btns.innerHTML = `
+                        <button id="m-cancel" class="bg-slate-200 hover:bg-slate-300 text-slate-800 px-5 py-2 rounded-lg font-bold transition-colors">Review Answers</button>
+                        <button id="m-ok" class="bg-blue-900 hover:bg-blue-800 text-white px-6 py-2 rounded-lg font-bold transition-colors shadow-md">Confirm & Print</button>`;
+                    document.getElementById('m-cancel').onclick = () => { modal.classList.add('hidden'); if(callback) callback(false); };
+                    document.getElementById('m-ok').onclick = () => { modal.classList.add('hidden'); if(callback) callback(true); };
+                }
+                modal.classList.remove('hidden');
+            }
+        };
 
-        // --- 2. DATABASE DOMANDE (Cybersecurity) ---
-        const mcqBank = [
-            { q: "What does the acronym DDoS stand for?", options: ["Data Distribution of Software", "Distributed Denial of Service", "Digital Defense of Systems", "Direct Download of Server"], a: "Distributed Denial of Service" },
-            { q: "What is the primary goal of a Phishing attack?", options: ["To physically destroy hardware", "To overwhelm a server with traffic", "To trick users into giving away passwords", "To speed up internet connections"], a: "To trick users into giving away passwords" },
-            { q: "How do computer viruses usually get installed?", options: ["Through hardware defects", "Built into the Wi-Fi router", "Usually unintentionally by the user downloading a program", "By typing too fast on the keyboard"], a: "Usually unintentionally by the user downloading a program" },
-            { q: "What happens to a server during a DDoS attack?", options: ["It gets flooded with requests and crashes", "It encrypts all user passwords", "It upgrades its security", "It tracks the hacker's location"], a: "It gets flooded with requests and crashes" }
-        ];
+        document.getElementById('student-date').value = new Date().toISOString().split('T')[0];
 
-        const tfBank = [
-            { statement: "Phishing attacks often rely on fake emails that look like they come from trusted banks.", ans: "True", just: "Hackers use deceptive emails to trick users into trusting a fake login page." },
-            { statement: "During a DDoS attack, hackers secretly steal data without the server noticing.", ans: "False", just: "A DDoS attack makes the server crash by overwhelming it with fake traffic, it's not a stealth data theft." }
-        ];
-
-        const sequenceBank = {
-            title: "Order the chronological steps of a typical Phishing Attack:",
-            steps: [
-                "Hacker sends a fake email posing as a trusted entity.",
-                "User clicks the malicious link provided in the email.",
-                "User lands on a replica website and types their credentials.",
-                "Hacker captures the data and accesses the real account."
+        // --- DATABASE ESERCIZI ULTRA-COMPLESSO (Con Soluzioni per il PDF) ---
+        const EXAM_BANK = {
+            mc: [
+                { 
+                    q: "When analyzing the encapsulation process of an outbound IP packet traversing through a stateful Layer 3 firewall, which of the following statements most accurately describes the sequence of header transformations and specific layer responsibilities?", 
+                    opts: [
+                        { text: "The Transport Layer receives data streams from the Session Layer, segments them into manageable units, and appends a TCP/UDP header containing source and destination port numbers to ensure reliable process-to-process delivery across the network.", correct: true },
+                        { text: "The Network Layer receives segments from the Transport Layer, encapsulates them into packets, and appends a header containing source and destination MAC addresses to guarantee local delivery before routing to external subnets.", correct: false },
+                        { text: "The Data Link Layer processes incoming application data directly by dividing it into frames and utilizing logical IP addressing to verify the integrity of the data payload through a cyclic redundancy check (CRC) before physical transmission.", correct: false },
+                        { text: "The Physical Layer encapsulates Layer 3 packets into binary streams, simultaneously analyzing the application-level encryption keys to ensure that the bitwise transmission is secure from man-in-the-middle interception attacks.", correct: false }
+                    ]
+                },
+                { 
+                    q: "In an enterprise network architecture utilizing Network Address Translation (NAT) and Port Address Translation (PAT), how does the edge router mathematically and logically manage simultaneous outbound requests from hundreds of internal private hosts to external public web servers?", 
+                    opts: [
+                        { text: "The router rewrites the source IP of the outbound packet to its single public IP interface and dynamically assigns a unique, randomly generated source port number, storing this specific mapping in its stateful NAT translation table to accurately route returning traffic.", correct: true },
+                        { text: "The router dynamically assigns a temporary public IPv6 address from its internal DHCP pool to each private host, ensuring that the original source MAC address remains intact throughout the entire routing process over the global Internet.", correct: false },
+                        { text: "The router performs a direct translation of the internal host's MAC address into a public IP address using the Address Resolution Protocol (ARP), allowing the external web server to bypass Layer 3 routing and communicate directly with the local host.", correct: false },
+                        { text: "The router utilizes a symmetric encryption algorithm to obfuscate the internal private IP addresses, embedding the original routing instructions inside the TCP payload so the destination server can reverse-engineer the return path without a NAT table.", correct: false }
+                    ]
+                },
+                { 
+                    q: "Considering the fundamental operational discrepancies between connection-oriented and connectionless protocols, which defining characteristic specifically mandates the use of TCP over UDP for secure HTTPS banking transactions?", 
+                    opts: [
+                        { text: "TCP requires the successful completion of a SYN/SYN-ACK/ACK three-way handshake prior to data transmission, utilizes sequence numbers to reorder fragmented packets, and employs explicit acknowledgments to guarantee delivery, mitigating data corruption.", correct: true },
+                        { text: "TCP operates exclusively at the Application Layer (Layer 7), inherently providing SSL/TLS encryption by default, whereas UDP is strictly a Network Layer (Layer 3) protocol incapable of carrying encrypted payloads.", correct: false },
+                        { text: "TCP drastically reduces transmission latency by intentionally ignoring dropped packets and omitting flow control mechanisms, which is mathematically essential for processing high-speed algorithmic financial transactions securely.", correct: false },
+                        { text: "TCP replaces the standard IP routing mechanism with a proprietary MAC-address-based switching architecture, physically preventing unauthorized intermediate routers from sniffing the encapsulated banking payloads.", correct: false }
+                    ]
+                }
+            ],
+            match: [
+                { 
+                    q: "Analyze the following highly detailed technical definitions. Match the correct protocol/concept (Left) with its precise operational mechanism (Right) by selecting the appropriate letter.",
+                    pairs: [
+                        { l: "Address Resolution Protocol (ARP) Operation", r: "It functions by broadcasting a request packet containing a target logical IP address across the local subnet. The specific device holding that IP responds with a unicast packet containing its physical hardware address (MAC), enabling the sender to construct a valid Layer 2 frame." },
+                        { l: "Dynamic Host Configuration Protocol (DHCP)", r: "Initiates communication via a broadcast Discover message to locate an available server on the segment. This is followed by a unicast Offer containing lease details, a formal Request from the client to lock the assigned parameters, and a final Acknowledgment." },
+                        { l: "Domain Name System (DNS) Resolution", r: "Operates predominantly over UDP port 53 to provide a hierarchical, decentralized naming system. It intercepts human-readable hostnames requested by the application layer and iteratively queries root, TLD, and authoritative servers to resolve them into routable IP addresses." },
+                        { l: "Subnet Masking & CIDR Logic", r: "Utilizes a continuous sequence of binary 1s followed by binary 0s to mathematically isolate the network prefix from the host identifier within an IP address. By performing a bitwise logical AND operation, routers determine if a destination IP resides on the local LAN or requires external gateway routing." }
+                    ]
+                },
+                {
+                    q: "Match the OSI Model Layer to its highly specific technological responsibility and PDU (Protocol Data Unit) encapsulation phase.",
+                    pairs: [
+                        { l: "Layer 4: Transport", r: "Responsible for end-to-end logical communication and multiplexing. It accepts application data, divides it into 'Segments' (or Datagrams), and appends source/destination port headers to facilitate simultaneous service connections on a single host." },
+                        { l: "Layer 3: Network", r: "Tasked with logical addressing and optimal path determination across multiple distinct networks. It encapsulates Transport layer segments into 'Packets', inserting source and destination IP addresses, and utilizes routing protocols like OSPF or BGP." },
+                        { l: "Layer 2: Data Link", r: "Provides node-to-node data transfer and error detection over the physical medium. It wraps Layer 3 packets into 'Frames', appending physical MAC addresses in the header and a Frame Check Sequence (FCS) in the trailer for integrity validation." },
+                        { l: "Layer 7: Application", r: "Serves as the primary interface between the software application and the network services. It generates the raw 'Data' payload, relying on protocols such as HTTP, SMTP, or FTP to format requests logically before initiating the lower-layer encapsulation." }
+                    ]
+                }
+            ],
+            fill: [
+                { 
+                    q: "The transition from standard HTTP to secure HTTPS fundamentally alters the threat model of web traffic. Initially, an [asymmetric] cryptographic handshake is negotiated, where the server presents its digital certificate containing a [public] key. The client uses this to securely transmit a pre-master secret. Once this mathematical exchange concludes, the session immediately shifts to [symmetric] encryption (like AES) for the actual data payload, because it is computationally much faster while still ensuring absolute [confidentiality] and data integrity.",
+                    solution: "asymmetric, public, symmetric, confidentiality"
+                },
+                { 
+                    q: "When a router processes an incoming packet, it first extracts the destination IP address from the Layer [3] header. It then performs a bitwise [AND] operation against its routing table's subnet masks to find the longest prefix match. If the destination network is not directly connected, the router forwards the packet to its [default] gateway, but only after decrementing the [TTL] (Time To Live) field by one to prevent infinite routing loops.",
+                    solution: "3 (or Three), AND, default, TTL (or Time To Live)"
+                }
+            ],
+            tf: [
+                { 
+                    q: "CRITICAL ANALYSIS: The UDP protocol guarantees the absolute sequential delivery of data by forcing the receiving device to send an acknowledgment (ACK) packet for every single datagram received, making it the mathematically superior choice for real-time live video streaming.", 
+                    correct: "FALSE",
+                    solutionKey: "FALSE. UDP (User Datagram Protocol) is 'connectionless' and 'best-effort'. It does NOT use acknowledgments (ACKs), does not guarantee delivery, and does not reorder packets. It is preferred for live streaming precisely because the lack of this overhead reduces latency, allowing dropped frames rather than buffering."
+                },
+                { 
+                    q: "CRITICAL ANALYSIS: In an IPv4 subnet configured with a /24 CIDR notation (Subnet Mask 255.255.255.0), the network theoretically contains 256 total IP addresses, but mathematically only 254 of those addresses can be actively assigned to host devices such as computers or printers.", 
+                    correct: "TRUE",
+                    solutionKey: "TRUE. A /24 subnet yields 256 total addresses (2^8). However, the first address (e.g., .0) is strictly reserved to identify the Network itself, and the last address (e.g., .255) is reserved as the Broadcast address for that subnet, leaving exactly 254 usable host addresses."
+                }
+            ],
+            scenario: [
+                { 
+                    q: "TROUBLESHOOTING SCENARIO: An employee's workstation (IP: 192.168.1.50) can successfully 'ping 8.8.8.8' and receives replies. It can also access local intranet servers via IP. However, when the employee types 'https://www.cisco.com' into the browser, it instantly returns an 'ERR_NAME_NOT_RESOLVED' or 'Server Not Found' error. \n\nProvide a systematic, highly detailed technical diagnosis of this exact failure. Identify the specific protocol that has failed, explain WHY the ping to 8.8.8.8 worked while the web address failed, and detail the exact administrative steps to resolve the issue at the workstation level.",
+                    rubric: "EXPECTED SOLUTION (Grading Rubric):\n1. Protocol Failure: DNS (Domain Name System) resolution failure.\n2. Why Ping Works: Ping 8.8.8.8 uses ICMP and a direct IP, proving Layer 1-3 connectivity and routing/NAT are functioning perfectly.\n3. Why URL Fails: The browser cannot translate the human-readable domain 'www.cisco.com' into a routable IP address because the configured DNS server is unreachable or incorrect.\n4. Resolution: Verify/Change the DNS server settings on the NIC (e.g., to 8.8.8.8), flush the local DNS cache (ipconfig /flushdns), or verify port 53 is unblocked."
+                }
+            ],
+            open: [
+                { 
+                    q: "DETAILED ARCHITECTURAL ESSAY: Deconstruct the TCP Three-Way Handshake mechanism. You must explain the precise sequence of packets exchanged (SYN, SYN-ACK, ACK), the purpose of sequence numbers in this phase, and critically analyze why this connection-oriented overhead is mandatory for protocols like HTTP, yet actively avoided by protocols like VoIP.",
+                    rubric: "EXPECTED SOLUTION (Grading Rubric):\n- Step 1: Client sends SYN (Synchronize) packet with initial sequence number to Server.\n- Step 2: Server responds with SYN-ACK, acknowledging client's sequence and sending its own.\n- Step 3: Client sends final ACK. Connection established.\n- Purpose: Establishes reliable, ordered, error-checked delivery stream.\n- Protocol contrast: HTTP requires 100% accuracy (missing bytes break a webpage). VoIP requires low latency and can tolerate lost packets (a momentary audio glitch is better than audio arriving 3 seconds late)."
+                },
+                { 
+                    q: "DETAILED ARCHITECTURAL ESSAY: Critically evaluate the structural and mathematical limitations of the IPv4 protocol that led to global address exhaustion. Contrast this with the architecture of IPv6. In your analysis, include the bit-length differences, the representational format (decimal vs. hexadecimal), and explain at least two native, built-in features of IPv6 that eliminate the need for NAT.",
+                    rubric: "EXPECTED SOLUTION (Grading Rubric):\n- IPv4 limitation: 32-bit architecture yields only ~4.3 billion addresses, exhausted by device proliferation.\n- IPv6 architecture: 128-bit architecture yields virtually infinite addresses (340 undecillion).\n- Format: IPv4 uses dotted-decimal (e.g., 192.168.1.1). IPv6 uses hexadecimal separated by colons (e.g., 2001:0db8::ff00:42:8329).\n- NAT Elimination: Because every device can have a unique globally routable Public IPv6 address, NAT (which was a patch for IPv4 exhaustion) is rendered obsolete. IPv6 also includes native IPSec support and simplified headers for faster routing."
+                }
             ]
         };
 
-        const matchesBank = [
-            {t: "Virus", d: "An executable program that harms the computer."},
-            {t: "DDoS", d: "An attack that crashes a server via traffic flood."},
-            {t: "Phishing", d: "A scam using fake emails to steal passwords."},
-            {t: "URL", d: "The web address you must check for legitimacy."}
-        ];
+        function shuffle(array) { return array.sort(() => 0.5 - Math.random()); }
 
-        const troubleshootingBank = { 
-            sc: "A popular video game goes offline. Servers are receiving millions of fake connection requests per second, blocking real players.", 
-            ans: "DDoS Attack", 
-            reason: "The server is being overwhelmed by a flood of fake traffic, causing a Denial of Service." 
-        };
-
-        // --- 3. FUNZIONI DI SUPPORTO ---
-        const shuffle = arr => arr.sort(() => Math.random() - 0.5);
-        const generateId = () => 'CYB-' + Math.random().toString(36).substring(2,6).toUpperCase() + '-' + Math.random().toString(36).substring(2,6).toUpperCase();
-
-        // --- 4. GENERATORE DEL FOGLIO (RENDER HTML) ---
-        function generateWorksheet() {
-            const uniqueId = generateId();
-            document.getElementById('doc-id').textContent = uniqueId;
-            document.getElementById('barcode-display').textContent = uniqueId.replace(/-/g, '');
-
-            let html = '';
-            let s = 2;
+        function initProceduralTest() {
+            testUniqueId = 'A-NET-' + Math.random().toString(36).substr(2, 6).toUpperCase();
+            document.getElementById('test-id-display').textContent = `ID: ${testUniqueId}`;
             
-            // Helper per gli header di sezione (Bellissimi graficamente)
-            const secHead = (title, pts, icon) => `
-                <div class="avoid-break mb-8">
-                <div class="flex items-center mb-5">
-                    <div class="bg-cyber-dark text-white font-mono text-sm font-bold px-3 py-1.5 rounded-l flex items-center shadow-sm">PART ${s++}</div>
-                    <div class="bg-slate-50 text-slate-800 font-bold px-4 py-1.5 flex-1 uppercase tracking-wider text-sm border-y border-r border-slate-200 rounded-r flex items-center shadow-sm">
-                        <i class="${icon} text-cyber-accent mr-2"></i> ${title}
-                    </div>
-                    <div class="ml-4 text-sm font-bold text-slate-400">[ ${pts} Marks ]</div>
-                </div>`;
+            const selMC = shuffle([...EXAM_BANK.mc]).slice(0, 3);
+            const selMatch = shuffle([...EXAM_BANK.match]).slice(0, 2);
+            const selFill = shuffle([...EXAM_BANK.fill]).slice(0, 2);
+            const selTF = shuffle([...EXAM_BANK.tf]).slice(0, 2);
+            const selScen = shuffle([...EXAM_BANK.scenario]).slice(0, 1);
+            const selOpen = shuffle([...EXAM_BANK.open]).slice(0, 2);
 
-            // PART 2: MCQ
-            const mcqs = shuffle([...mcqBank]);
-            html += secHead("Multiple Choice Questions", 20, "fa-solid fa-list-check");
-            html += `<div class="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6 pl-2 border-l-2 border-slate-100">`;
-            mcqs.forEach((q, i) => {
-                html += `<div class="avoid-break"><p class="font-bold text-sm text-slate-800 mb-3">${i + 1}. ${q.q}</p><div class="space-y-2 text-sm text-slate-600">`;
-                shuffle([...q.options]).forEach(opt => {
-                    const corr = (opt === q.a) ? '<span class="solution-marker">✓ Correct</span>' : '';
-                    html += `<label class="flex items-start mcq-label cursor-pointer"><input type="radio" name="m_${i}" class="mt-1 mr-3 accent-cyber-accent"><span>${opt} ${corr}</span></label>`;
-                });
-                html += `</div></div>`;
+            generatedQuestions = [
+                ...selMC.map(q => ({ type: 'mc', ...q })),
+                ...selMatch.map(q => ({ type: 'match', ...q })),
+                ...selFill.map(q => ({ type: 'fill', ...q })),
+                ...selTF.map(q => ({ type: 'tf', ...q })),
+                ...selScen.map(q => ({ type: 'scenario', ...q })),
+                ...selOpen.map(q => ({ type: 'open', ...q }))
+            ];
+
+            const container = document.getElementById('questions-container');
+            container.innerHTML = '';
+
+            generatedQuestions.forEach((item, index) => {
+                const qNum = index + 1;
+                const card = document.createElement('div');
+                card.className = "bg-white p-8 rounded-3xl border border-slate-200 shadow-lg relative overflow-hidden";
+                
+                let contentHTML = `<div class="absolute top-0 left-0 w-3 h-full bg-gradient-to-b from-blue-900 to-amber-500"></div>
+                                   <div class="pl-6">
+                                   <div class="flex gap-4 mb-4 items-center">
+                                     <span class="bg-blue-900 text-white font-black px-4 py-1.5 rounded-lg text-sm shadow-md tracking-wider">EXERCISE ${qNum}</span>`;
+
+                if (item.type === 'mc') {
+                    contentHTML += `<span class="text-xs text-slate-500 font-bold uppercase tracking-widest border border-slate-300 px-2 py-1 rounded">Multiple Choice</span></div>
+                                    <h4 class="font-bold text-slate-800 text-xl mb-6 leading-relaxed">${item.q}</h4>
+                                    <div class="space-y-4">`;
+                    // Conserviamo l'oggetto corretto prima dello shuffle
+                    item.shuffledOpts = shuffle([...item.opts]);
+                    item.shuffledOpts.forEach((opt, i) => {
+                        contentHTML += `<label class="flex items-start gap-4 p-5 border-2 border-slate-100 rounded-xl hover:bg-blue-50 hover:border-blue-200 cursor-pointer transition-all shadow-sm">
+                                            <input type="radio" name="q_${index}" value="${opt.text}" class="mt-1.5 w-5 h-5 text-blue-700 accent-blue-700">
+                                            <span class="text-slate-700 font-medium leading-relaxed">${opt.text}</span>
+                                        </label>`;
+                    });
+                    contentHTML += `</div></div>`;
+                } 
+                else if (item.type === 'match') {
+                    contentHTML += `<span class="text-xs text-slate-500 font-bold uppercase tracking-widest border border-slate-300 px-2 py-1 rounded">Conceptual Matching</span></div>
+                                    <h4 class="font-bold text-slate-800 text-xl mb-6 leading-relaxed">${item.q}</h4>`;
+                    
+                    // Creazione lettere e shuffle destra
+                    const letters = ['A', 'B', 'C', 'D'];
+                    const shuffledRight = shuffle([...item.pairs.map(p => p.r)]);
+                    item.mappedRight = shuffledRight.map((text, i) => ({ letter: letters[i], text: text }));
+
+                    contentHTML += `<div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-6">`;
+                    
+                    // Colonna Sinistra (Da collegare)
+                    contentHTML += `<div class="space-y-5 bg-slate-50 p-6 rounded-2xl border border-slate-200">
+                                        <h5 class="font-bold text-slate-500 uppercase text-xs mb-3 tracking-widest">Select corresponding letter:</h5>`;
+                    item.pairs.forEach((pair, i) => {
+                        contentHTML += `<div class="flex items-center gap-4 bg-white p-4 rounded-xl shadow-sm border border-slate-100">
+                                            <select id="match_${index}_${i}" class="p-3 bg-blue-50 border-2 border-blue-200 text-blue-900 font-bold rounded-lg focus:ring-2 focus:border-amber-500 outline-none cursor-pointer">
+                                                <option value="">-</option>
+                                                ${letters.map(l => `<option value="${l}">${l}</option>`).join('')}
+                                            </select>
+                                            <span class="font-bold text-slate-800">${pair.l}</span>
+                                        </div>`;
+                    });
+                    contentHTML += `</div>`;
+
+                    // Colonna Destra (Opzioni con lettere)
+                    contentHTML += `<div class="space-y-4">
+                                        <h5 class="font-bold text-slate-500 uppercase text-xs mb-1 tracking-widest">Definitions:</h5>`;
+                    item.mappedRight.forEach(opt => {
+                        contentHTML += `<div class="flex gap-4 p-4 border border-slate-200 rounded-xl bg-white shadow-sm">
+                                            <div class="flex-shrink-0"><span class="letter-badge shadow-md">${opt.letter}</span></div>
+                                            <span class="text-slate-600 text-sm font-medium leading-relaxed">${opt.text}</span>
+                                        </div>`;
+                    });
+                    contentHTML += `</div></div></div>`;
+                }
+                else if (item.type === 'fill') {
+                    contentHTML += `<span class="text-xs text-slate-500 font-bold uppercase tracking-widest border border-slate-300 px-2 py-1 rounded">Missing Variables</span></div>
+                                    <div class="bg-amber-50 border-l-4 border-amber-500 p-4 mb-6 rounded-r-lg"><p class="font-bold text-amber-800 text-sm">Read the highly technical architecture analysis below and input the precise terminology required to complete the logic.</p></div>`;
+                    
+                    let parts = item.q.split(/\[([^\]]+)\]/g);
+                    let formattedText = `<p class="text-xl leading-[3rem] text-slate-700 font-medium">`;
+                    let blankCounter = 0;
+                    item.correctBlanks = [];
+                    
+                    parts.forEach((part, i) => {
+                        if (i % 2 === 0) formattedText += part;
+                        else {
+                            formattedText += `<input type="text" id="fill_${index}_${blankCounter}" class="fill-blank-input shadow-sm" placeholder="type term...">`;
+                            item.correctBlanks.push(part);
+                            blankCounter++;
+                        }
+                    });
+                    item.blanksCount = blankCounter;
+                    formattedText += `</p>`;
+                    contentHTML += formattedText + `</div>`;
+                }
+                else if (item.type === 'tf') {
+                    contentHTML += `<span class="text-xs text-slate-500 font-bold uppercase tracking-widest border border-slate-300 px-2 py-1 rounded">Boolean Logic & Justification</span></div>
+                                    <h4 class="font-bold text-slate-800 text-xl mb-6 leading-relaxed bg-slate-100 p-6 rounded-xl border border-slate-200 shadow-inner">"${item.q}"</h4>
+                                    
+                                    <div class="flex gap-6 mb-5">
+                                        <label class="flex-1 flex items-center justify-center gap-3 font-black text-emerald-800 bg-emerald-50 px-6 py-4 rounded-xl border-2 border-emerald-200 cursor-pointer hover:bg-emerald-100 transition-colors shadow-sm text-lg">
+                                            <input type="radio" name="tf_${index}" value="TRUE" class="w-5 h-5 accent-emerald-600"> TRUE
+                                        </label>
+                                        <label class="flex-1 flex items-center justify-center gap-3 font-black text-red-800 bg-red-50 px-6 py-4 rounded-xl border-2 border-red-200 cursor-pointer hover:bg-red-100 transition-colors shadow-sm text-lg">
+                                            <input type="radio" name="tf_${index}" value="FALSE" class="w-5 h-5 accent-red-600"> FALSE
+                                        </label>
+                                    </div>
+                                    <textarea id="tf_just_${index}" class="w-full h-32 p-5 bg-white border-2 border-slate-200 rounded-xl focus:border-blue-500 outline-none resize-none text-slate-700 leading-relaxed shadow-inner" placeholder="Provide a highly technical, multi-sentence justification proving your Boolean selection..."></textarea>
+                                    </div>`;
+                }
+                else if (item.type === 'scenario' || item.type === 'open') {
+                    const typeLabel = item.type === 'scenario' ? 'Troubleshooting Engineering Scenario' : 'Detailed Architectural Essay';
+                    contentHTML += `<span class="text-xs text-slate-500 font-bold uppercase tracking-widest border border-slate-300 px-2 py-1 rounded">${typeLabel}</span></div>
+                                    <h4 class="font-bold text-slate-800 text-xl mb-6 leading-relaxed">${item.q}</h4>
+                                    <textarea id="open_${index}" class="w-full h-48 p-5 bg-white border-2 border-slate-200 rounded-xl focus:border-blue-500 outline-none resize-none text-slate-700 leading-relaxed shadow-inner font-mono text-sm" placeholder="Begin your technical dissertation here. Use correct terminology, specify OSI layers, and delineate your logical steps clearly..."></textarea>
+                                    </div>`;
+                }
+
+                card.innerHTML = contentHTML;
+                container.appendChild(card);
             });
-            html += `</div></div>`;
+        }
 
-            // PART 3: Matching
-            let t=[], d=[], l=['A','B','C','D'];
-            shuffle([...matchesBank]).forEach(m => { t.push(m.t); d.push({txt:m.d, orig:m.t}); }); 
-            d = shuffle(d);
+        // --- SICUREZZA ---
+        function unlockAssessment() {
+            const name = document.getElementById('student-name').value.trim();
+            const surname = document.getElementById('student-surname').value.trim();
+            const cls = document.getElementById('student-class').value;
+            const date = document.getElementById('student-date').value;
+            const pwd = document.getElementById('session-password').value;
+
+            if (!name || !surname || !cls || !date) { Modal.show("Incomplete Record", "All identification fields are mandatory.", "alert"); return; }
+            if (pwd !== STUDENT_PWD) { Modal.show("Authentication Failed", "Invalid cryptographic key.", "alert"); return; }
+
+            const dp = date.split('-');
+            studentData = { name, surname, cls, date: `${dp[2]}/${dp[1]}/${dp[0]}` };
             
-            html += secHead("Terminology Matching", 20, "fa-solid fa-link");
-            html += `<div class="grid grid-cols-1 md:grid-cols-12 gap-6 pl-2 border-l-2 border-slate-100">
-                <div class="md:col-span-5 space-y-4">`;
-            t.forEach(term => {
-                let ans = ''; d.forEach((def,idx) => { if(def.orig===term) ans=l[idx]; });
-                html += `<div class="flex items-center text-sm"><input type="text" class="match-box mr-4 shadow-sm" maxlength="1"><span class="font-bold text-slate-700 bg-white px-3 py-2 border border-slate-200 rounded shadow-sm w-32">${term}</span><span class="solution-marker ml-3 text-lg">${ans}</span></div>`;
-            });
-            html += `</div><div class="md:col-span-7 space-y-3 bg-slate-50 p-5 rounded-lg border border-slate-200 text-sm shadow-inner">`;
-            d.forEach((def,i) => html += `<div class="flex"><strong class="text-cyber-accent w-6">${l[i]}.</strong> <span class="text-slate-600">${def.txt}</span></div>`);
-            html += `</div></div></div>`;
-
-            // PART 4: Sequencing
-            const steps = shuffle([...sequenceBank.steps]);
-            html += secHead("Attack Sequencing", 15, "fa-solid fa-arrow-down-1-9");
-            html += `<p class="text-sm text-slate-500 italic mb-5 pl-2">${sequenceBank.title}</p><div class="space-y-4 pl-2 border-l-2 border-slate-100">`;
-            steps.forEach(st => {
-                let corr = sequenceBank.steps.indexOf(st) + 1;
-                html += `<div class="flex items-center text-sm avoid-break"><input type="text" class="match-box mr-4 h-10 w-10 text-lg"><span class="bg-white px-4 py-2 border border-slate-200 rounded flex-1 shadow-sm text-slate-700">${st}</span><span class="solution-marker w-20 text-center">Step ${corr}</span></div>`;
-            });
-            html += `</div></div>`;
-
-            // PART 5: True/False + Justification
-            html += secHead("Analysis & Justification", 15, "fa-solid fa-scale-balanced");
-            html += `<div class="space-y-8 pl-2 border-l-2 border-slate-100">`;
-            shuffle([...tfBank]).forEach((q, i) => {
-                html += `<div class="avoid-break bg-white p-4 border border-slate-200 rounded-lg shadow-sm">
-                    <p class="font-bold text-sm text-slate-800 mb-3">${i + 1}. ${q.statement}</p>
-                    <div class="flex gap-6 text-sm font-bold mb-4 text-slate-600">
-                        <label class="flex items-center cursor-pointer hover:text-cyber-accent transition"><input type="radio" name="tf_${i}" class="mr-2 accent-cyber-accent"> TRUE</label>
-                        <label class="flex items-center cursor-pointer hover:text-cyber-accent transition"><input type="radio" name="tf_${i}" class="mr-2 accent-cyber-accent"> FALSE</label>
-                        <span class="solution-marker bg-red-50 px-2 rounded">Ans: ${q.ans}</span>
-                    </div>
-                    <div class="text-[10px] uppercase tracking-widest text-slate-400 mb-1 font-bold">Justification from video:</div>
-                    <input type="text" class="line-input">
-                    <div class="solution-text">${q.just}</div>
-                </div>`;
-            });
-            html += `</div></div>`;
-
-            // PART 6: Troubleshooting Scenario
-            html += secHead("Security Scenario", 20, "fa-solid fa-user-ninja");
-            html += `<div class="bg-slate-800 p-5 rounded-lg border-l-4 border-cyber-accent text-white font-mono text-sm mb-5 shadow-lg relative overflow-hidden">
-                <i class="fa-solid fa-triangle-exclamation absolute -right-4 -bottom-4 text-6xl text-white/5"></i>
-                <span class="text-cyber-accent font-bold">INCIDENT REPORT:</span> ${troubleshootingBank.sc}
-            </div>
-            <div class="pl-2 border-l-2 border-slate-100 space-y-5">
-                <div class="avoid-break">
-                    <div class="text-sm font-bold text-slate-700 mb-2">1. Identify the specific cyber attack:</div>
-                    <input type="text" class="line-input text-lg font-bold text-cyber-dark">
-                    <div class="solution-text">${troubleshootingBank.ans}</div>
-                </div>
-                <div class="avoid-break">
-                    <div class="text-sm font-bold text-slate-700 mb-2">2. Explain the mechanism causing the outage:</div>
-                    <input type="text" class="line-input">
-                    <input type="text" class="line-input mt-2">
-                    <div class="solution-text">${troubleshootingBank.reason}</div>
-                </div>
-            </div></div>`;
-
-            document.getElementById('dynamic-exercises').innerHTML = html;
-        }
-
-        // --- 5. GESTIONE UI TABS E MODALI ---
-        function requestTabAccess(tabId) {
-            if (tabId === 'worksheet' || isTeacherMode) { switchTab(tabId); } 
-            else {
-                pendingTab = tabId;
-                document.getElementById('auth-modal').classList.remove('hidden');
-                document.getElementById('tab-pwd').value = '';
-                document.getElementById('tab-pwd').focus();
-            }
-        }
-
-        function verifyTabAccess() {
-            if (document.getElementById('tab-pwd').value === TEACHER_PASSWORD) {
-                isTeacherMode = true;
-                closeAuthModal();
-                const lockIcon = document.getElementById('icon-transcript');
-                lockIcon.classList.replace('fa-lock', 'fa-unlock'); 
-                lockIcon.classList.replace('text-cyber-alert', 'text-cyber-success');
-                document.querySelectorAll('.locked-tab').forEach(el => el.classList.remove('locked-tab', 'text-slate-400'));
-                if (pendingTab) switchTab(pendingTab);
-            } else { 
-                const input = document.getElementById('tab-pwd');
-                input.classList.add('border-cyber-alert', 'bg-red-50');
-                setTimeout(() => input.classList.remove('border-cyber-alert', 'bg-red-50'), 500);
-            }
-        }
-
-        function closeAuthModal() { document.getElementById('auth-modal').classList.add('hidden'); }
-
-        function switchTab(t) {
-            document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
-            document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
-            document.getElementById('tab-'+t).classList.add('active');
-            document.getElementById('btn-'+t).classList.add('active');
-        }
-
-        // --- 6. MOTORE ESPORTAZIONE PDF AVANZATO ---
-        function openPdfModal() {
-            switchTab('worksheet');
-            document.getElementById('pdf-modal').classList.remove('hidden');
-            document.getElementById('teacher-pwd').value = ''; 
-        }
-        function closePdfModal() { document.getElementById('pdf-modal').classList.add('hidden'); }
-
-        async function processDownload(withSol) {
-            if(withSol && document.getElementById('teacher-pwd').value !== TEACHER_PASSWORD) {
-                alert("Incorrect Examiner Password"); return;
-            }
-
-            closePdfModal();
+            document.getElementById('auth-modal').classList.add('hidden');
+            const mainContent = document.getElementById('main-content');
+            mainContent.classList.remove('hidden');
+            setTimeout(() => mainContent.classList.remove('opacity-0'), 100);
             
-            // Attiva overlay di caricamento visivo
-            document.body.classList.add('is-loading');
+            testUnlocked = true;
+            initProceduralTest();
+            startAntiCheat();
+        }
 
-            // 1. Aspetta che i font personalizzati (Google Fonts) siano completamente caricati
-            await document.fonts.ready;
+        function updateProctorBadge() {
+            const badge = document.getElementById('proctoring-badge');
+            if (cheatWarnings === 0) return;
+            badge.className = "mt-5 inline-flex items-center gap-2 bg-red-100 text-red-800 px-5 py-2 rounded-full text-sm font-bold border border-red-300 animate-pulse";
+            badge.innerHTML = `<i class="fa-solid fa-triangle-exclamation"></i> VIOLATIONS: ${cheatWarnings}/${MAX_WARNINGS} RECORDED`;
+        }
 
-            // 2. Aggiunge la classe magica che formatta il foglio per il PDF (larghezza fissa, niente ombre, ecc)
-            const wrapper = document.getElementById('pdf-content-wrapper');
-            document.body.classList.add('pdf-export-mode');
-            
-            // 3. Gestione visualizzazione soluzioni rosse
-            if(withSol) wrapper.classList.add('solution-active');
-
-            // 4. Pausa necessaria per far elaborare al browser i cambi CSS prima di scattare la foto
-            await new Promise(resolve => setTimeout(resolve, 800)); 
-
-            // 5. Opzioni per alta qualità html2pdf
-            const opt = {
-                margin:       [15, 0, 15, 0], // Margini top e bottom (left/right gestiti dal max-width interno)
-                filename:     withSol ? 'KEY_Cybersecurity_CLIL.pdf' : 'EXAM_Cybersecurity_CLIL.pdf',
-                image:        { type: 'jpeg', quality: 1 },
-                html2canvas:  { 
-                    scale: 2,           // Retina quality
-                    useCORS: true,      // Permette icone esterne (fontawesome, bandiere)
-                    letterRendering: true,
-                    scrollY: 0,
-                    windowWidth: 800    // Forza larghezza canvas
-                },
-                jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
+        function startAntiCheat() {
+            document.addEventListener('copy', e => e.preventDefault());
+            document.addEventListener('paste', e => e.preventDefault());
+            document.addEventListener('cut', e => e.preventDefault());
+            document.onkeydown = function(e) {
+                if(e.keyCode === 123) return false;
+                if(e.ctrlKey && e.shiftKey && (e.keyCode === 73 || e.keyCode === 74 || e.keyCode === 67)) return false;
+                if(e.ctrlKey && e.keyCode === 85) return false;
             };
-
-            // 6. Generazione e Download
-            try {
-                await html2pdf().set(opt).from(wrapper).save();
-            } catch (error) {
-                console.error("PDF Generation failed:", error);
-                alert("Errore durante la generazione del PDF.");
-            } finally {
-                // 7. Pulizia finale: riporta il sito alla normalità
-                document.body.classList.remove('pdf-export-mode');
-                document.body.classList.remove('is-loading');
-                wrapper.classList.remove('solution-active');
-            }
+            document.addEventListener('visibilitychange', () => {
+                if (document.hidden && testUnlocked) {
+                    cheatWarnings++;
+                    updateProctorBadge();
+                    if (cheatWarnings > MAX_WARNINGS) {
+                        Modal.show("TERMINATED", "You have repeatedly breached the environment rules. Submitting automatically.", "alert", () => submitAndGeneratePDF(true));
+                    } else {
+                        setTimeout(() => Modal.show("SECURITY WARNING", `Violation ${cheatWarnings}/${MAX_WARNINGS}. Do not navigate away from the exam tab.`, "alert"), 200);
+                    }
+                }
+            });
+            window.addEventListener('beforeunload', (e) => { if (testUnlocked) { e.preventDefault(); e.returnValue = ''; } });
         }
 
-        // Init all'avvio
-        window.onload = generateWorksheet;
+        function askSubmit() {
+            Modal.show("Confirm Submission", "Generate the Teacher Master PDF? Once initialized, no further edits are possible.", "confirm", (res) => {
+                if (res) submitAndGeneratePDF(false);
+            });
+        }
+
+        // --- MOTORE PDF EVOLUTO (Soluzioni Integrate, Box Punteggio, Colori) ---
+        async function submitAndGeneratePDF(isForced = false) {
+            const overlay = document.getElementById('processing-overlay');
+            overlay.classList.remove('hidden');
+            testUnlocked = false; 
+
+            const finalResults = generatedQuestions.map((q, index) => {
+                let answerObj = { student: "", correct: "" };
+                
+                if (q.type === 'mc') {
+                    const checked = document.querySelector(`input[name="q_${index}"]:checked`);
+                    answerObj.student = checked ? checked.value : "[NO ANSWER PROVIDED]";
+                    const correctOpt = q.shuffledOpts.find(o => o.correct);
+                    answerObj.correct = correctOpt ? correctOpt.text : "Error finding solution.";
+                } 
+                else if (q.type === 'match') {
+                    let sArr = []; let cArr = [];
+                    q.pairs.forEach((p, i) => {
+                        const val = document.getElementById(`match_${index}_${i}`).value || "-";
+                        sArr.push(`[${val}] matched with: ${p.l}`);
+                        
+                        // Trova la lettera corretta per questa specifica riga
+                        const correctText = p.r;
+                        const correctObj = q.mappedRight.find(mr => mr.text === correctText);
+                        cArr.push(`CORRECT: [${correctObj.letter}] -> ${p.l}`);
+                    });
+                    answerObj.student = sArr.join('\n');
+                    answerObj.correct = cArr.join('\n');
+                }
+                else if (q.type === 'fill') {
+                    let blanks = [];
+                    for(let i=0; i<q.blanksCount; i++) {
+                        blanks.push(document.getElementById(`fill_${index}_${i}`).value.trim() || "[_]");
+                    }
+                    answerObj.student = `Provided terms: ${blanks.join(', ')}`;
+                    answerObj.correct = `Solution Key: ${q.solution}`;
+                }
+                else if (q.type === 'tf') {
+                    const checked = document.querySelector(`input[name="tf_${index}"]:checked`);
+                    const choice = checked ? checked.value : "[NONE]";
+                    const just = document.getElementById(`tf_just_${index}`).value.trim() || "[NO JUSTIFICATION]";
+                    answerObj.student = `Selected: ${choice}\nJustification: ${just}`;
+                    answerObj.correct = q.solutionKey;
+                }
+                else if (q.type === 'scenario' || q.type === 'open') {
+                    answerObj.student = document.getElementById(`open_${index}`).value.trim() || "[BLANK]";
+                    answerObj.correct = q.rubric;
+                }
+                return { questionData: q, answerData: answerObj };
+            });
+
+            try {
+                const { jsPDF } = window.jspdf;
+                const doc = new jsPDF({ orientation: 'p', unit: 'mm', format: 'a4' });
+                
+                const pageWidth = 210; const pageHeight = 297; const margin = 15;
+                const contentWidth = pageWidth - (margin * 2);
+                let yPos = 20;
+
+                // Testo con wrap intelligente e gestione colore
+                function printText(text, fontSize, isBold, rgb, indent = 0) {
+                    if(!text) return;
+                    doc.setFont("helvetica", isBold ? "bold" : "normal");
+                    doc.setFontSize(fontSize);
+                    doc.setTextColor(rgb[0], rgb[1], rgb[2]);
+                    const lines = doc.splitTextToSize(String(text), contentWidth - indent);
+                    
+                    for (let i = 0; i < lines.length; i++) {
+                        if (yPos > pageHeight - 20) {
+                            doc.addPage();
+                            yPos = 20;
+                            doc.setFont("helvetica", "italic"); doc.setFontSize(8); doc.setTextColor(150, 150, 150);
+                            doc.text(`ID: ${testUniqueId} - MASTER KEY`, pageWidth - margin, 10, { align: 'right' });
+                            doc.setFont("helvetica", isBold ? "bold" : "normal"); doc.setFontSize(fontSize); doc.setTextColor(rgb[0], rgb[1], rgb[2]);
+                        }
+                        doc.text(lines[i], margin + indent, yPos);
+                        yPos += (fontSize * 0.35) + 1.5; 
+                    }
+                    yPos += 1;
+                }
+
+                // Disegna il box rosso per il punteggio
+                function drawScoreBox(currY) {
+                    const boxW = 28; const boxH = 8;
+                    // Protezione page break per il box
+                    if (currY > pageHeight - 15) { doc.addPage(); currY = 20; yPos = 20; }
+                    doc.setDrawColor(220, 38, 38); // Red
+                    doc.setLineWidth(0.5);
+                    doc.rect(pageWidth - margin - boxW, currY - 6, boxW, boxH);
+                    doc.setFont("helvetica", "bold"); doc.setFontSize(10); doc.setTextColor(220, 38, 38);
+                    doc.text("Pts: ___ /10", pageWidth - margin - boxW + 2, currY - 0.5);
+                }
+
+                // --- HEADER PDF MASTER ---
+                doc.setFillColor(30, 58, 138); doc.rect(0, 0, pageWidth, 40, 'F');
+                doc.setTextColor(255, 255, 255); doc.setFont("helvetica", "bold"); doc.setFontSize(20);
+                doc.text("TEACHER MASTER COPY - EVALUATION", margin, 20);
+                doc.setFontSize(11); doc.setFont("helvetica", "normal");
+                doc.text("Includes Auto-Grading & Embedded Rubrics", margin, 28);
+                
+                doc.setFontSize(9); doc.setFont("helvetica", "bold"); doc.setTextColor(250, 204, 21); // Amber
+                doc.text(`UID: ${testUniqueId}`, pageWidth - margin, 15, { align: 'right' });
+                doc.setTextColor(200, 200, 200); doc.setFont("helvetica", "normal");
+                doc.text(`Generated: ${new Date().toLocaleString()}`, pageWidth - margin, 21, { align: 'right' });
+                
+                yPos = 50;
+                printText(`Student: ${studentData.name} ${studentData.surname}  |  Class: ${studentData.cls}  |  Date: ${studentData.date}`, 12, true, [30, 30, 30]);
+                if (isForced || cheatWarnings > 0) {
+                    yPos += 2;
+                    printText(`⚠️ SECURITY FLAG: ${cheatWarnings} proctoring violations recorded. Inspect answers closely.`, 11, true, [220, 38, 38]);
+                }
+                yPos += 5; doc.setDrawColor(200); doc.line(margin, yPos, pageWidth - margin, yPos); yPos += 10;
+
+                // --- RENDERING DOMANDE, RISPOSTE, SOLUZIONI, SCORE BOX ---
+                finalResults.forEach((res, i) => {
+                    let startY = yPos;
+                    
+                    // Titolo Esercizio
+                    printText(`EXERCISE ${i + 1} (${res.questionData.type.toUpperCase()})`, 13, true, [30, 58, 138]);
+                    
+                    // Disegna Score Box a destra, allineato col titolo
+                    drawScoreBox(startY + 4);
+
+                    // Testo Domanda
+                    if(res.questionData.type === 'fill') {
+                        printText("[Fill in the blanks assignment. See Solution Key below]", 10, false, [100, 100, 100]);
+                    } else {
+                        printText(res.questionData.q, 10, true, [50, 50, 50], 0);
+                    }
+                    yPos += 2;
+
+                    // STUDENT ANSWER
+                    printText("Student's Answer:", 9, true, [100, 116, 139], 2); // Slate
+                    printText(res.answerData.student, 10, false, [30, 41, 59], 6); // Dark Slate
+                    
+                    yPos += 3;
+
+                    // CORRECT SOLUTION / RUBRIC
+                    printText("SYSTEM SOLUTION / RUBRIC:", 9, true, [5, 150, 105], 2); // Emerald Green
+                    printText(res.answerData.correct, 10, true, [5, 150, 105], 6); // Bold Green
+                    
+                    yPos += 8;
+                    doc.setDrawColor(220, 220, 220); doc.setLineWidth(0.2);
+                    doc.line(margin, yPos, pageWidth - margin, yPos);
+                    yPos += 8;
+                });
+
+                // Footer
+                const pageCount = doc.internal.getNumberOfPages();
+                for(let i = 1; i <= pageCount; i++) {
+                    doc.setPage(i);
+                    doc.setFont("helvetica", "italic"); doc.setFontSize(8); doc.setTextColor(150, 150, 150);
+                    doc.text(`Page ${i} of ${pageCount} - Automated Evaluation System`, pageWidth/2, pageHeight - 10, {align: 'center'});
+                }
+
+                setTimeout(() => {
+                    doc.save(`MASTER_KEY_${studentData.surname}_${studentData.cls.substring(0,2)}.pdf`);
+                    overlay.innerHTML = `
+                        <div class="text-center animate-fade-in">
+                            <i class="fa-solid fa-file-circle-check text-8xl text-emerald-500 mb-6 drop-shadow-lg"></i>
+                            <h2 class="text-4xl font-bold text-white serif-title mb-4">Master PDF Saved</h2>
+                            <p class="text-emerald-100 text-lg mb-8 max-w-md mx-auto leading-relaxed">The Teacher Evaluation Copy with solutions and score boxes has been successfully generated.</p>
+                            <button onclick="location.reload()" class="bg-emerald-600 hover:bg-emerald-500 text-white px-10 py-4 rounded-xl font-bold text-lg shadow-xl transition-all">End Session</button>
+                        </div>
+                    `;
+                }, 2500);
+
+            } catch (error) {
+                console.error("PDF Gen Error:", error);
+                Modal.show("Critical Error", "PDF compilation failed. See console.", "alert");
+                overlay.classList.add('hidden');
+            }
+        }
     </script>
 </body>
 </html>
